@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Pre-populate with a standard sequence
     let timers = [
-        { id: 1, name: 'Foco Profundo', type: 'work', total: 25*60, remaining: 25*60 },
-        { id: 2, name: 'Descanso Ativo', type: 'rest', total: 5*60, remaining: 5*60 },
-        { id: 3, name: 'Foco Profundo', type: 'work', total: 25*60, remaining: 25*60 },
-        { id: 4, name: 'Descanso Longo', type: 'rest', total: 15*60, remaining: 15*60 }
+        { id: 1, name: 'Foco Profundo 1', type: 'work', total: 50*60, remaining: 50*60 },
+        { id: 2, name: 'Descanso livre', type: 'rest', total: 10*60, remaining: 10*60 },
+        { id: 3, name: 'Foco Profundo 2', type: 'work', total: 40*60, remaining: 40*60 },
+        { id: 4, name: 'Descanso Ativo', type: 'rest', total: 20*60, remaining: 20*60 }
     ];
     
     let currentTimerIndex = 0;
