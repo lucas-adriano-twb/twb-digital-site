@@ -464,3 +464,11 @@ img { max-width: 100%; height: auto; display: block; }
     50% { opacity: 1; }
     100% { opacity: 0.8; }
 }
+
+@media (max-width: 768px) {
+    #timer-form > div[style*="grid"],
+    .card-alt > div[style*="grid"] {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+}
