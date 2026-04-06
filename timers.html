@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timers | TWB Digital</title>
+    <meta name="description" content="Ferramenta de gestão de tempo e produtividade da TWB Digital.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏱️</text></svg>">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="container header-container">
+            <a href="/index.html" class="logo">
+                <span class="logo-text">TWB Digital<span class="logo-dot">.</span></span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Abrir menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <nav class="nav" id="nav">
+                <ul class="nav-list">
+                    <li><a href="/index.html" class="nav-link">Início</a></li>
+                    <li><a href="/timers.html" class="nav-link" style="color: var(--color-primary);">Timers</a></li>
+                    <li><a href="https://wa.me/5512996304490" class="btn btn-outline nav-btn" target="_blank" rel="noopener noreferrer">Fale Conosco</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding-top: 120px; min-height: calc(100vh - 200px); padding-bottom: var(--spacing-xl);">
+        <div class="container">
+            <div class="section-header">
+                <h1 class="section-title" style="font-size: 3rem;">Gestão de Tempo</h1>
+                <p class="section-desc">Configure timers personalizados para suas sessões de foco, reuniões ou tarefas estratégicas.</p>
+            </div>
+
+            <!-- Form to Add Timer -->
+            <div class="card card-alt" style="max-width: 600px; margin: 0 auto 2rem; padding: 2.5rem;">
+                <form id="timer-form" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label for="timer-name" style="color: var(--color-text); font-size: 0.875rem; font-weight: 500;">Nome / Função do Timer</label>
+                            <input type="text" id="timer-name" placeholder="Ex: Sessão de Foco..." required class="form-input">
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label for="timer-type" style="color: var(--color-text); font-size: 0.875rem; font-weight: 500;">Tipo</label>
+                            <select id="timer-type" class="form-input" style="cursor: pointer;">
+                                <option value="work">Foco / Trabalho</option>
+                                <option value="rest">Descanso Ativo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label for="timer-minutes" style="color: var(--color-text); font-size: 0.875rem; font-weight: 500;">Minutos</label>
+                            <input type="number" id="timer-minutes" min="0" max="999" value="25" required class="form-input">
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label for="timer-seconds" style="color: var(--color-text); font-size: 0.875rem; font-weight: 500;">Segundos</label>
+                            <input type="number" id="timer-seconds" min="0" max="59" value="0" required class="form-input">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Adicionar à Sequência</button>
+                </form>
+            </div>
+
+            <!-- Configurações de Alerta -->
+            <div class="card card-alt" style="max-width: 600px; margin: 0 auto 2rem; padding: 2rem;">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.2rem; color: var(--color-heading);">Configurações de Alerta</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.75rem; color: var(--color-text); cursor: pointer;">
+                            <input type="checkbox" id="enable-focus-prealert" checked class="custom-checkbox">
+                            <span>Pré-alerta de Foco</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.75rem; color: var(--color-text); cursor: pointer;">
+                            <input type="checkbox" id="enable-rest-prealert" checked class="custom-checkbox">
+                            <span>Pré-alerta de Descanso</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.75rem; color: var(--color-text); cursor: pointer;">
+                            <input type="checkbox" id="enable-main-alarm" checked class="custom-checkbox">
+                            <span>Alarme Principal (Fim do Timer)</span>
+                        </label>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label for="focus-prealert-time" style="color: var(--color-text); font-size: 0.875rem;">Tempo do Pré-alerta de Foco (segundos)</label>
+                            <input type="number" id="focus-prealert-time" value="30" min="1" max="300" class="form-input" style="width: 100%;">
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label for="rest-prealert-time" style="color: var(--color-text); font-size: 0.875rem;">Tempo do Pré-alerta de Descanso (segundos)</label>
+                            <input type="number" id="rest-prealert-time" value="30" min="1" max="300" class="form-input" style="width: 100%;">
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label for="alarm-duration" style="color: var(--color-text); font-size: 0.875rem;">Duração do Alarme (segundos)</label>
+                            <input type="number" id="alarm-duration" value="4" min="2" max="10" class="form-input" style="width: 100%;">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label for="prealert-sound" style="color: var(--color-text); font-size: 0.875rem;">Som do Pré-alerta</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select id="prealert-sound" class="form-input" style="flex: 1;">
+                                <option value="chime">Notification Chime</option>
+                                <option value="retro">Retro Success</option>
+                                <option value="urgent">Urgent Pulse</option>
+                            </select>
+                            <button type="button" class="btn btn-outline btn-preview" id="btn-preview-prealert" title="Testar Som">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label for="main-alarm-sound" style="color: var(--color-text); font-size: 0.875rem;">Som do Alarme Principal</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select id="main-alarm-sound" class="form-input" style="flex: 1;">
+                                <option value="urgent">Urgent Pulse</option>
+                                <option value="chime">Notification Chime</option>
+                                <option value="retro">Retro Success</option>
+                            </select>
+                            <button type="button" class="btn btn-outline btn-preview" id="btn-preview-alarm" title="Testar Som">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label for="global-volume" style="color: var(--color-text); font-size: 0.875rem; display: flex; justify-content: space-between;">
+                        <span>Volume Global</span>
+                        <span id="volume-value">50%</span>
+                    </label>
+                    <input type="range" id="global-volume" min="0" max="100" value="50" style="width: 100%; cursor: pointer;">
+                </div>
+            </div>
+
+            <!-- Global Controls -->
+            <div class="sequence-controls" style="max-width: 600px; margin: 0 auto 4rem; display: flex; justify-content: center; gap: 1rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                <button class="btn btn-primary" id="btn-toggle-seq" style="min-width: 220px; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    Iniciar Sequência
+                </button>
+                <button class="btn btn-outline" id="btn-reset-seq" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+                    Reiniciar Tudo
+                </button>
+            </div>
+
+            <!-- Timers Grid -->
+            <div class="grid cards-grid" id="timers-container">
+                <!-- Timers will be injected here by JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+                <p>&copy; <span id="current-year"></span> TWB Digital. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+    <script src="/timers.js"></script>
+</body>
+</html>

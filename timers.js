@@ -1,0 +1,433 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('timer-form');
+    const container = document.getElementById('timers-container');
+    const btnToggleSeq = document.getElementById('btn-toggle-seq');
+    const btnResetSeq = document.getElementById('btn-reset-seq');
+    
+    // Pre-populate with a standard sequence
+    let timers = [
+        { id: 1, name: 'Foco Profundo', type: 'work', total: 25*60, remaining: 25*60 },
+        { id: 2, name: 'Descanso Ativo', type: 'rest', total: 5*60, remaining: 5*60 },
+        { id: 3, name: 'Foco Profundo', type: 'work', total: 25*60, remaining: 25*60 },
+        { id: 4, name: 'Descanso Longo', type: 'rest', total: 15*60, remaining: 15*60 }
+    ];
+    
+    let currentTimerIndex = 0;
+    let isSequenceRunning = false;
+    let sequenceInterval = null;
+    let audioCtx = null;
+    let masterGain = null;
+    let currentTimerState = { hasPlayedPreAlert: false, playedTicks: new Set() };
+
+    function resetTimerState() {
+        currentTimerState = {
+            hasPlayedPreAlert: false,
+            playedTicks: new Set()
+        };
+    }
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            masterGain = audioCtx.createGain();
+            masterGain.connect(audioCtx.destination);
+            
+            const volumeSlider = document.getElementById('global-volume');
+            if (volumeSlider) {
+                masterGain.gain.value = parseInt(volumeSlider.value) / 100;
+            }
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function playMelody(type, duration = null) {
+        initAudio();
+        const now = audioCtx.currentTime;
+        const playDuration = duration || (type === 'chime' ? 0.9 : type === 'retro' ? 0.6 : 2);
+        
+        if (type === 'chime') {
+            // Notification Chime: Major 3rd interval sequence (C5, E5, G5)
+            const notes = [523.25, 659.25, 783.99];
+            const noteDuration = 0.3;
+            const sequenceDuration = notes.length * noteDuration;
+            const iterations = Math.ceil(playDuration / sequenceDuration);
+            
+            for (let iter = 0; iter < iterations; iter++) {
+                notes.forEach((freq, i) => {
+                    const startTime = now + iter * sequenceDuration + i * noteDuration;
+                    if (startTime >= now + playDuration) return;
+                    
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    
+                    gain.gain.setValueAtTime(0, startTime);
+                    gain.gain.linearRampToValueAtTime(0.2, startTime + 0.05);
+                    
+                    const stopTime = Math.min(startTime + noteDuration, now + playDuration);
+                    gain.gain.exponentialRampToValueAtTime(0.001, stopTime);
+                    
+                    osc.connect(gain);
+                    gain.connect(masterGain);
+                    
+                    osc.start(startTime);
+                    osc.stop(stopTime);
+                });
+            }
+        } else if (type === 'retro') {
+            // Retro Success: Fast ascending 8-bit arpeggio
+            const notes = [440, 554.37, 659.25, 880, 1108.73, 1318.51];
+            const noteDuration = 0.1;
+            const sequenceDuration = notes.length * noteDuration;
+            const iterations = Math.ceil(playDuration / sequenceDuration);
+            
+            for (let iter = 0; iter < iterations; iter++) {
+                notes.forEach((freq, i) => {
+                    const startTime = now + iter * sequenceDuration + i * noteDuration;
+                    if (startTime >= now + playDuration) return;
+                    
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.value = freq;
+                    
+                    gain.gain.setValueAtTime(0.1, startTime);
+                    
+                    const stopTime = Math.min(startTime + noteDuration, now + playDuration);
+                    gain.gain.setValueAtTime(0, stopTime - 0.01);
+                    
+                    osc.connect(gain);
+                    gain.connect(masterGain);
+                    
+                    osc.start(startTime);
+                    osc.stop(stopTime);
+                });
+            }
+        } else if (type === 'urgent') {
+            // Urgent Pulse: Alternating high-low dual-tone siren
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            
+            const pulseRate = 0.3;
+            const iterations = Math.ceil(playDuration / pulseRate);
+            
+            for (let i = 0; i < iterations; i++) {
+                const startTime = now + i * pulseRate;
+                if (startTime >= now + playDuration) break;
+                const freq = i % 2 === 0 ? 880 : 660;
+                osc.frequency.setValueAtTime(freq, startTime);
+            }
+            
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.linearRampToValueAtTime(0.001, now + playDuration);
+            
+            osc.connect(gain);
+            gain.connect(masterGain);
+            
+            osc.start(now);
+            osc.stop(now + playDuration);
+        }
+    }
+
+    function playPreAlert() {
+        const typeSelect = document.getElementById('prealert-sound');
+        const melodyType = typeSelect ? typeSelect.value : 'chime';
+        playMelody(melodyType, null);
+    }
+
+    function playTick() {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.05);
+    }
+
+    function playFinalAlarm(isPreview = false) {
+        const enableMainAlarm = document.getElementById('enable-main-alarm');
+        if (!isPreview && enableMainAlarm && !enableMainAlarm.checked) return;
+
+        const durationInput = document.getElementById('alarm-duration');
+        const duration = durationInput ? (parseInt(durationInput.value) || 4) : 4;
+        
+        const typeSelect = document.getElementById('main-alarm-sound');
+        const melodyType = typeSelect ? typeSelect.value : 'urgent';
+        
+        playMelody(melodyType, duration);
+    }
+
+    function formatTime(totalSeconds) {
+        const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        const s = (totalSeconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    function updateGlobalControls() {
+        if (!btnToggleSeq) return;
+        if (timers.length === 0) {
+            btnToggleSeq.disabled = true;
+            btnToggleSeq.innerHTML = 'Adicione um timer';
+            return;
+        }
+        btnToggleSeq.disabled = false;
+        if (isSequenceRunning) {
+            btnToggleSeq.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> Pausar Sequência';
+        } else {
+            btnToggleSeq.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Iniciar Sequência';
+        }
+    }
+
+    function renderTimers() {
+        if (!container) return;
+        container.innerHTML = '';
+        timers.forEach((timer, index) => {
+            const percentage = (timer.remaining / timer.total) * 100;
+            const isFinished = timer.remaining === 0;
+            const isActive = index === currentTimerIndex;
+            const isRunningNow = isActive && isSequenceRunning;
+
+            const card = document.createElement('div');
+            card.className = `card timer-card type-${timer.type} ${isActive ? 'active' : ''} ${isRunningNow ? 'running' : ''}`;
+            
+            card.innerHTML = `
+                <div class="timer-badge">${timer.type === 'work' ? 'Trabalho' : 'Descanso'}</div>
+                <h3 class="card-title" style="margin-bottom: 0;">${timer.name}</h3>
+                <div class="timer-display ${isFinished ? 'finished' : ''}">${formatTime(timer.remaining)}</div>
+                
+                <div class="timer-controls">
+                    <button class="btn-icon" onclick="toggleTimer(${timer.id})" title="${isRunningNow ? 'Pausar' : 'Iniciar a partir daqui'}">
+                        ${isRunningNow 
+                            ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>' 
+                            : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>'}
+                    </button>
+                    <button class="btn-icon" onclick="resetTimer(${timer.id})" title="Reiniciar este timer">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+                    </button>
+                    <button class="btn-icon danger" onclick="deleteTimer(${timer.id})" title="Excluir">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>
+                <div class="timer-progress-bar">
+                    <div class="timer-progress-fill" style="width: ${percentage}%"></div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function tick() {
+        if (timers.length === 0) return;
+        let current = timers[currentTimerIndex];
+        
+        current.remaining--;
+        renderTimers();
+
+        const elFocusPre = document.getElementById('enable-focus-prealert');
+        const elRestPre = document.getElementById('enable-rest-prealert');
+        const elFocusPreTime = document.getElementById('focus-prealert-time');
+        const elRestPreTime = document.getElementById('rest-prealert-time');
+        
+        const focusPreAlertEnabled = elFocusPre ? elFocusPre.checked : false;
+        const restPreAlertEnabled = elRestPre ? elRestPre.checked : false;
+        
+        const focusPreAlertTime = elFocusPreTime ? (parseInt(elFocusPreTime.value) || 30) : 30;
+        const restPreAlertTime = elRestPreTime ? (parseInt(elRestPreTime.value) || 30) : 30;
+
+        const isFocus = current.type === 'work';
+        const isRest = current.type === 'rest';
+        
+        const preAlertEnabled = (isFocus && focusPreAlertEnabled) || (isRest && restPreAlertEnabled);
+        const preAlertTime = isFocus ? focusPreAlertTime : restPreAlertTime;
+
+        if (preAlertEnabled && current.remaining === preAlertTime && !currentTimerState.hasPlayedPreAlert) {
+            playPreAlert();
+            currentTimerState.hasPlayedPreAlert = true;
+        }
+
+        if (current.remaining <= 10 && current.remaining > 0 && !currentTimerState.playedTicks.has(current.remaining)) {
+            playTick();
+            currentTimerState.playedTicks.add(current.remaining);
+        }
+
+        if (current.remaining <= 0) {
+            playFinalAlarm();
+            clearInterval(sequenceInterval);
+            
+            const durationInput = document.getElementById('alarm-duration');
+            const duration = durationInput ? (parseInt(durationInput.value) || 4) : 4;
+            
+            setTimeout(() => {
+                current.remaining = current.total;
+                currentTimerIndex++;
+                if (currentTimerIndex >= timers.length) {
+                    currentTimerIndex = 0; // Loop back to start
+                }
+                resetTimerState();
+                if (isSequenceRunning) {
+                    sequenceInterval = setInterval(tick, 1000);
+                    renderTimers();
+                }
+            }, duration * 1000); // delay before switching to next to match alarm
+        }
+    }
+
+    window.toggleTimer = (id) => {
+        initAudio();
+        const index = timers.findIndex(t => t.id === id);
+        if (index === -1) return;
+
+        if (isSequenceRunning && currentTimerIndex === index) {
+            // Pause
+            isSequenceRunning = false;
+            clearInterval(sequenceInterval);
+        } else {
+            // Start from this timer
+            isSequenceRunning = true;
+            if (currentTimerIndex !== index) {
+                currentTimerIndex = index;
+                resetTimerState();
+            }
+            clearInterval(sequenceInterval);
+            sequenceInterval = setInterval(tick, 1000);
+        }
+        renderTimers();
+        updateGlobalControls();
+    };
+
+    window.resetTimer = (id) => {
+        const index = timers.findIndex(t => t.id === id);
+        if (index === -1) return;
+        timers[index].remaining = timers[index].total;
+        if (currentTimerIndex === index) {
+            resetTimerState();
+            if (isSequenceRunning) {
+                isSequenceRunning = false;
+                clearInterval(sequenceInterval);
+            }
+        }
+        renderTimers();
+        updateGlobalControls();
+    };
+
+    window.deleteTimer = (id) => {
+        const index = timers.findIndex(t => t.id === id);
+        if (index === -1) return;
+        
+        timers.splice(index, 1);
+        
+        if (timers.length === 0) {
+            isSequenceRunning = false;
+            clearInterval(sequenceInterval);
+            currentTimerIndex = 0;
+            resetTimerState();
+        } else if (currentTimerIndex === index) {
+            isSequenceRunning = false;
+            clearInterval(sequenceInterval);
+            if (currentTimerIndex >= timers.length) {
+                currentTimerIndex = 0;
+            }
+            resetTimerState();
+        } else if (currentTimerIndex > index) {
+            currentTimerIndex--;
+        }
+        renderTimers();
+        updateGlobalControls();
+    };
+
+    if (btnToggleSeq) {
+        btnToggleSeq.addEventListener('click', () => {
+            initAudio();
+            if (timers.length === 0) return;
+            if (isSequenceRunning) {
+                isSequenceRunning = false;
+                clearInterval(sequenceInterval);
+            } else {
+                isSequenceRunning = true;
+                clearInterval(sequenceInterval);
+                sequenceInterval = setInterval(tick, 1000);
+            }
+            renderTimers();
+            updateGlobalControls();
+        });
+    }
+
+    if (btnResetSeq) {
+        btnResetSeq.addEventListener('click', () => {
+            isSequenceRunning = false;
+            clearInterval(sequenceInterval);
+            currentTimerIndex = 0;
+            resetTimerState();
+            timers.forEach(t => t.remaining = t.total);
+            renderTimers();
+            updateGlobalControls();
+        });
+    }
+
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('timer-name').value;
+            const type = document.getElementById('timer-type').value;
+            const minutes = parseInt(document.getElementById('timer-minutes').value) || 0;
+            const seconds = parseInt(document.getElementById('timer-seconds').value) || 0;
+            
+            const totalSeconds = (minutes * 60) + seconds;
+            if (totalSeconds <= 0) return;
+
+            const newTimer = {
+                id: Date.now(),
+                name,
+                type,
+                total: totalSeconds,
+                remaining: totalSeconds
+            };
+
+            timers.push(newTimer);
+            form.reset();
+            document.getElementById('timer-type').value = type === 'work' ? 'rest' : 'work'; // Auto-toggle type for convenience
+            document.getElementById('timer-minutes').value = type === 'work' ? "5" : "25"; // Auto-suggest times
+            document.getElementById('timer-seconds').value = "0";
+            renderTimers();
+            updateGlobalControls();
+        });
+    }
+
+    // Initial render
+    renderTimers();
+    updateGlobalControls();
+
+    const volumeSlider = document.getElementById('global-volume');
+    const volumeValue = document.getElementById('volume-value');
+    if (volumeSlider && volumeValue) {
+        volumeSlider.addEventListener('input', (e) => {
+            volumeValue.textContent = `${e.target.value}%`;
+            if (masterGain) {
+                masterGain.gain.value = parseInt(e.target.value) / 100;
+            }
+        });
+    }
+
+    const btnPreviewPrealert = document.getElementById('btn-preview-prealert');
+    if (btnPreviewPrealert) {
+        btnPreviewPrealert.addEventListener('click', () => {
+            playPreAlert();
+        });
+    }
+
+    const btnPreviewAlarm = document.getElementById('btn-preview-alarm');
+    if (btnPreviewAlarm) {
+        btnPreviewAlarm.addEventListener('click', () => {
+            playFinalAlarm(true);
+        });
+    }
+});
