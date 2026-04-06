@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Pre-populate with a standard sequence
     let timers = [
-        { id: 1, name: 'Foco Profundo 1', type: 'work', total: 50*60, remaining: 50*60 },
-        { id: 2, name: 'Descanso livre', type: 'rest', total: 10*60, remaining: 10*60 },
-        { id: 3, name: 'Foco Profundo 2', type: 'work', total: 40*60, remaining: 40*60 },
-        { id: 4, name: 'Descanso Ativo', type: 'rest', total: 20*60, remaining: 20*60 }
+        { id: 1, name: 'Foco Profundo', type: 'work', total: 25*60, remaining: 25*60 },
+        { id: 2, name: 'Descanso Ativo', type: 'rest', total: 5*60, remaining: 5*60 },
+        { id: 3, name: 'Foco Profundo', type: 'work', total: 25*60, remaining: 25*60 },
+        { id: 4, name: 'Descanso Longo', type: 'rest', total: 15*60, remaining: 15*60 }
     ];
     
     let currentTimerIndex = 0;
@@ -18,6 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let audioCtx = null;
     let masterGain = null;
     let currentTimerState = { hasPlayedPreAlert: false, playedTicks: new Set() };
+    
+    let targetEndTime = null;
+    let keepAliveOsc = null;
+    let keepAliveGain = null;
+    let wakeLock = null;
+    let whiteNoiseSource = null;
+    let whiteNoiseGain = null;
 
     function resetTimerState() {
         currentTimerState = {
@@ -39,6 +46,92 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (audioCtx.state === 'suspended') {
             audioCtx.resume();
+        }
+    }
+
+    async function enableKeepAlive() {
+        initAudio();
+        if (!keepAliveOsc) {
+            keepAliveOsc = audioCtx.createOscillator();
+            keepAliveGain = audioCtx.createGain();
+            keepAliveGain.gain.value = 0.00001; // Silent
+            keepAliveOsc.connect(keepAliveGain);
+            keepAliveGain.connect(masterGain);
+            keepAliveOsc.start();
+        }
+        try {
+            if ('wakeLock' in navigator && !wakeLock) {
+                wakeLock = await navigator.wakeLock.request('screen');
+            }
+        } catch (err) {
+            console.log('Wake Lock error:', err);
+        }
+    }
+
+    function disableKeepAlive() {
+        if (keepAliveOsc) {
+            keepAliveOsc.stop();
+            keepAliveOsc.disconnect();
+            keepAliveGain.disconnect();
+            keepAliveOsc = null;
+            keepAliveGain = null;
+        }
+        if (wakeLock) {
+            wakeLock.release().then(() => {
+                wakeLock = null;
+            });
+        }
+    }
+
+    function startWhiteNoise() {
+        initAudio();
+        if (whiteNoiseSource) return;
+
+        const bufferSize = audioCtx.sampleRate * 2;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        whiteNoiseSource = audioCtx.createBufferSource();
+        whiteNoiseSource.buffer = buffer;
+        whiteNoiseSource.loop = true;
+
+        whiteNoiseGain = audioCtx.createGain();
+        const noiseVolumeInput = document.getElementById('white-noise-volume');
+        const noiseVol = noiseVolumeInput ? parseInt(noiseVolumeInput.value) / 100 : 0.1;
+        whiteNoiseGain.gain.value = noiseVol;
+
+        whiteNoiseSource.connect(whiteNoiseGain);
+        whiteNoiseGain.connect(masterGain);
+        whiteNoiseSource.start();
+    }
+
+    function stopWhiteNoise() {
+        if (whiteNoiseSource) {
+            whiteNoiseSource.stop();
+            whiteNoiseSource.disconnect();
+            whiteNoiseGain.disconnect();
+            whiteNoiseSource = null;
+            whiteNoiseGain = null;
+        }
+    }
+
+    function manageWhiteNoiseState() {
+        if (timers.length === 0) {
+            stopWhiteNoise();
+            return;
+        }
+        
+        const current = timers[currentTimerIndex];
+        const enableWhiteNoise = document.getElementById('enable-white-noise');
+        const isWhiteNoiseEnabled = enableWhiteNoise ? enableWhiteNoise.checked : false;
+
+        if (isSequenceRunning && current.type === 'work' && isWhiteNoiseEnabled) {
+            startWhiteNoise();
+        } else {
+            stopWhiteNoise();
         }
     }
 
@@ -229,7 +322,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (timers.length === 0) return;
         let current = timers[currentTimerIndex];
         
-        current.remaining--;
+        if (targetEndTime === null) {
+            targetEndTime = Date.now() + current.remaining * 1000;
+        }
+
+        let newRemaining = Math.ceil((targetEndTime - Date.now()) / 1000);
+        if (newRemaining < 0) newRemaining = 0;
+        
+        current.remaining = newRemaining;
         renderTimers();
 
         const elFocusPre = document.getElementById('enable-focus-prealert');
@@ -262,6 +362,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (current.remaining <= 0) {
             playFinalAlarm();
             clearInterval(sequenceInterval);
+            targetEndTime = null;
+            stopWhiteNoise();
             
             const durationInput = document.getElementById('alarm-duration');
             const duration = durationInput ? (parseInt(durationInput.value) || 4) : 4;
@@ -274,8 +376,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 resetTimerState();
                 if (isSequenceRunning) {
+                    targetEndTime = Date.now() + timers[currentTimerIndex].remaining * 1000;
                     sequenceInterval = setInterval(tick, 1000);
                     renderTimers();
+                    manageWhiteNoiseState();
                 }
             }, duration * 1000); // delay before switching to next to match alarm
         }
@@ -290,6 +394,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Pause
             isSequenceRunning = false;
             clearInterval(sequenceInterval);
+            targetEndTime = null;
+            disableKeepAlive();
         } else {
             // Start from this timer
             isSequenceRunning = true;
@@ -297,9 +403,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentTimerIndex = index;
                 resetTimerState();
             }
+            targetEndTime = Date.now() + timers[currentTimerIndex].remaining * 1000;
             clearInterval(sequenceInterval);
             sequenceInterval = setInterval(tick, 1000);
+            enableKeepAlive();
         }
+        manageWhiteNoiseState();
         renderTimers();
         updateGlobalControls();
     };
@@ -313,8 +422,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isSequenceRunning) {
                 isSequenceRunning = false;
                 clearInterval(sequenceInterval);
+                targetEndTime = null;
+                disableKeepAlive();
             }
         }
+        manageWhiteNoiseState();
         renderTimers();
         updateGlobalControls();
     };
@@ -328,18 +440,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (timers.length === 0) {
             isSequenceRunning = false;
             clearInterval(sequenceInterval);
+            targetEndTime = null;
             currentTimerIndex = 0;
             resetTimerState();
+            disableKeepAlive();
         } else if (currentTimerIndex === index) {
             isSequenceRunning = false;
             clearInterval(sequenceInterval);
+            targetEndTime = null;
             if (currentTimerIndex >= timers.length) {
                 currentTimerIndex = 0;
             }
             resetTimerState();
+            disableKeepAlive();
         } else if (currentTimerIndex > index) {
             currentTimerIndex--;
         }
+        manageWhiteNoiseState();
         renderTimers();
         updateGlobalControls();
     };
@@ -351,11 +468,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isSequenceRunning) {
                 isSequenceRunning = false;
                 clearInterval(sequenceInterval);
+                targetEndTime = null;
+                disableKeepAlive();
             } else {
                 isSequenceRunning = true;
+                targetEndTime = Date.now() + timers[currentTimerIndex].remaining * 1000;
                 clearInterval(sequenceInterval);
                 sequenceInterval = setInterval(tick, 1000);
+                enableKeepAlive();
             }
+            manageWhiteNoiseState();
             renderTimers();
             updateGlobalControls();
         });
@@ -365,9 +487,12 @@ document.addEventListener('DOMContentLoaded', () => {
         btnResetSeq.addEventListener('click', () => {
             isSequenceRunning = false;
             clearInterval(sequenceInterval);
+            targetEndTime = null;
             currentTimerIndex = 0;
             resetTimerState();
             timers.forEach(t => t.remaining = t.total);
+            disableKeepAlive();
+            manageWhiteNoiseState();
             renderTimers();
             updateGlobalControls();
         });
@@ -413,6 +538,24 @@ document.addEventListener('DOMContentLoaded', () => {
             volumeValue.textContent = `${e.target.value}%`;
             if (masterGain) {
                 masterGain.gain.value = parseInt(e.target.value) / 100;
+            }
+        });
+    }
+
+    const enableWhiteNoiseCheckbox = document.getElementById('enable-white-noise');
+    if (enableWhiteNoiseCheckbox) {
+        enableWhiteNoiseCheckbox.addEventListener('change', () => {
+            manageWhiteNoiseState();
+        });
+    }
+
+    const whiteNoiseVolumeSlider = document.getElementById('white-noise-volume');
+    const whiteNoiseVolumeValue = document.getElementById('white-noise-volume-value');
+    if (whiteNoiseVolumeSlider && whiteNoiseVolumeValue) {
+        whiteNoiseVolumeSlider.addEventListener('input', (e) => {
+            whiteNoiseVolumeValue.textContent = `${e.target.value}%`;
+            if (whiteNoiseGain) {
+                whiteNoiseGain.gain.value = parseInt(e.target.value) / 100;
             }
         });
     }
