@@ -466,9 +466,20 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 @media (max-width: 768px) {
+    /* Força empilhamento vertical nas grades do formulário */
     #timer-form > div[style*="grid"],
     .card-alt > div[style*="grid"] {
         grid-template-columns: 1fr !important;
         gap: 1rem !important;
+    }
+    
+    /* Quebra o eixo flexível dos botões e anula o estrangulamento de largura */
+    .sequence-controls {
+        flex-direction: column !important;
+    }
+    
+    .sequence-controls .btn {
+        width: 100% !important;
+        min-width: 0 !important;
     }
 }
