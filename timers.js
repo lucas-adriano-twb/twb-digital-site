@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Pre-populate with a standard sequence
     let timers = [
-        { id: 1, name: 'Foco Profundo', type: 'work', total: 25*60, remaining: 25*60 },
-        { id: 2, name: 'Descanso Ativo', type: 'rest', total: 5*60, remaining: 5*60 },
-        { id: 3, name: 'Foco Profundo', type: 'work', total: 25*60, remaining: 25*60 },
-        { id: 4, name: 'Descanso Longo', type: 'rest', total: 15*60, remaining: 15*60 }
+        { id: 1, name: 'Foco Profundo 1', type: 'work', total: 50*60, remaining: 50*60 },
+        { id: 2, name: 'Descanso Ativo 1', type: 'rest', total: 10*60, remaining: 10*60 },
+        { id: 3, name: 'Foco Profundo 2', type: 'work', total: 40*60, remaining: 40*60 },
+        { id: 4, name: 'Descanso Longo', type: 'rest', total: 20*60, remaining: 20*60 }
     ];
     
     let currentTimerIndex = 0;
@@ -23,8 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let keepAliveOsc = null;
     let keepAliveGain = null;
     let wakeLock = null;
-    let whiteNoiseSource = null;
-    let whiteNoiseGain = null;
+    let brownNoiseSource = null;
+    let brownNoiseGain = null;
+    
+    // NEW: Global array to track scheduled audio nodes
+    let scheduledAudioNodes = [];
 
     function resetTimerState() {
         currentTimerState = {
@@ -83,61 +86,79 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function startWhiteNoise() {
+    function startBrownNoise() {
         initAudio();
-        if (whiteNoiseSource) return;
+        if (brownNoiseSource) return;
 
         const bufferSize = audioCtx.sampleRate * 2;
         const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
         const data = buffer.getChannelData(0);
+        let lastOut = 0;
         for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
+            let white = Math.random() * 2 - 1;
+            data[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = data[i];
+            data[i] *= 3.5; // compensate for gain
         }
 
-        whiteNoiseSource = audioCtx.createBufferSource();
-        whiteNoiseSource.buffer = buffer;
-        whiteNoiseSource.loop = true;
+        brownNoiseSource = audioCtx.createBufferSource();
+        brownNoiseSource.buffer = buffer;
+        brownNoiseSource.loop = true;
 
-        whiteNoiseGain = audioCtx.createGain();
-        const noiseVolumeInput = document.getElementById('white-noise-volume');
+        brownNoiseGain = audioCtx.createGain();
+        const noiseVolumeInput = document.getElementById('brown-noise-volume');
         const noiseVol = noiseVolumeInput ? parseInt(noiseVolumeInput.value) / 100 : 0.1;
-        whiteNoiseGain.gain.value = noiseVol;
+        brownNoiseGain.gain.value = noiseVol;
 
-        whiteNoiseSource.connect(whiteNoiseGain);
-        whiteNoiseGain.connect(masterGain);
-        whiteNoiseSource.start();
+        brownNoiseSource.connect(brownNoiseGain);
+        brownNoiseGain.connect(masterGain);
+        brownNoiseSource.start();
     }
 
-    function stopWhiteNoise() {
-        if (whiteNoiseSource) {
-            whiteNoiseSource.stop();
-            whiteNoiseSource.disconnect();
-            whiteNoiseGain.disconnect();
-            whiteNoiseSource = null;
-            whiteNoiseGain = null;
+    function stopBrownNoise() {
+        if (brownNoiseSource) {
+            brownNoiseSource.stop();
+            brownNoiseSource.disconnect();
+            brownNoiseGain.disconnect();
+            brownNoiseSource = null;
+            brownNoiseGain = null;
         }
     }
 
-    function manageWhiteNoiseState() {
+    function manageBrownNoiseState() {
         if (timers.length === 0) {
-            stopWhiteNoise();
+            stopBrownNoise();
             return;
         }
         
-        const current = timers[currentTimerIndex];
-        const enableWhiteNoise = document.getElementById('enable-white-noise');
-        const isWhiteNoiseEnabled = enableWhiteNoise ? enableWhiteNoise.checked : false;
+        const enableBrownNoise = document.getElementById('enable-brown-noise');
+        const isBrownNoiseEnabled = enableBrownNoise ? enableBrownNoise.checked : false;
 
-        if (isSequenceRunning && current.type === 'work' && isWhiteNoiseEnabled) {
-            startWhiteNoise();
+        // NEW: Continuous Noise Override - Plays across ENTIRE sequence
+        if (isSequenceRunning && isBrownNoiseEnabled) {
+            startBrownNoise();
         } else {
-            stopWhiteNoise();
+            stopBrownNoise();
         }
     }
 
-    function playMelody(type, duration = null) {
+    // NEW: Cancellation Function
+    function cancelScheduledAudio() {
+        scheduledAudioNodes.forEach(node => {
+            try {
+                node.stop();
+                node.disconnect();
+            } catch (e) {
+                // Ignore if already stopped
+            }
+        });
+        scheduledAudioNodes = [];
+    }
+
+    // UPDATED: Accepts startTime for scheduling
+    function playMelody(type, duration = null, startTime = null) {
         initAudio();
-        const now = audioCtx.currentTime;
+        const now = startTime !== null ? startTime : audioCtx.currentTime;
         const playDuration = duration || (type === 'chime' ? 0.9 : type === 'retro' ? 0.6 : 2);
         
         if (type === 'chime') {
@@ -149,25 +170,27 @@ document.addEventListener('DOMContentLoaded', () => {
             
             for (let iter = 0; iter < iterations; iter++) {
                 notes.forEach((freq, i) => {
-                    const startTime = now + iter * sequenceDuration + i * noteDuration;
-                    if (startTime >= now + playDuration) return;
+                    const noteStartTime = now + iter * sequenceDuration + i * noteDuration;
+                    if (noteStartTime >= now + playDuration) return;
                     
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'sine';
                     osc.frequency.value = freq;
                     
-                    gain.gain.setValueAtTime(0, startTime);
-                    gain.gain.linearRampToValueAtTime(0.2, startTime + 0.05);
+                    gain.gain.setValueAtTime(0, noteStartTime);
+                    gain.gain.linearRampToValueAtTime(0.2, noteStartTime + 0.05);
                     
-                    const stopTime = Math.min(startTime + noteDuration, now + playDuration);
+                    const stopTime = Math.min(noteStartTime + noteDuration, now + playDuration);
                     gain.gain.exponentialRampToValueAtTime(0.001, stopTime);
                     
                     osc.connect(gain);
                     gain.connect(masterGain);
                     
-                    osc.start(startTime);
+                    osc.start(noteStartTime);
                     osc.stop(stopTime);
+                    
+                    if (startTime !== null) scheduledAudioNodes.push(osc);
                 });
             }
         } else if (type === 'retro') {
@@ -179,24 +202,26 @@ document.addEventListener('DOMContentLoaded', () => {
             
             for (let iter = 0; iter < iterations; iter++) {
                 notes.forEach((freq, i) => {
-                    const startTime = now + iter * sequenceDuration + i * noteDuration;
-                    if (startTime >= now + playDuration) return;
+                    const noteStartTime = now + iter * sequenceDuration + i * noteDuration;
+                    if (noteStartTime >= now + playDuration) return;
                     
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'square';
                     osc.frequency.value = freq;
                     
-                    gain.gain.setValueAtTime(0.1, startTime);
+                    gain.gain.setValueAtTime(0.1, noteStartTime);
                     
-                    const stopTime = Math.min(startTime + noteDuration, now + playDuration);
+                    const stopTime = Math.min(noteStartTime + noteDuration, now + playDuration);
                     gain.gain.setValueAtTime(0, stopTime - 0.01);
                     
                     osc.connect(gain);
                     gain.connect(masterGain);
                     
-                    osc.start(startTime);
+                    osc.start(noteStartTime);
                     osc.stop(stopTime);
+                    
+                    if (startTime !== null) scheduledAudioNodes.push(osc);
                 });
             }
         } else if (type === 'urgent') {
@@ -209,10 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const iterations = Math.ceil(playDuration / pulseRate);
             
             for (let i = 0; i < iterations; i++) {
-                const startTime = now + i * pulseRate;
-                if (startTime >= now + playDuration) break;
+                const noteStartTime = now + i * pulseRate;
+                if (noteStartTime >= now + playDuration) break;
                 const freq = i % 2 === 0 ? 880 : 660;
-                osc.frequency.setValueAtTime(freq, startTime);
+                osc.frequency.setValueAtTime(freq, noteStartTime);
             }
             
             gain.gain.setValueAtTime(0.1, now);
@@ -223,27 +248,36 @@ document.addEventListener('DOMContentLoaded', () => {
             
             osc.start(now);
             osc.stop(now + playDuration);
+            
+            if (startTime !== null) scheduledAudioNodes.push(osc);
         }
     }
 
     function playPreAlert() {
         const typeSelect = document.getElementById('prealert-sound');
         const melodyType = typeSelect ? typeSelect.value : 'chime';
-        playMelody(melodyType, null);
+        playMelody(melodyType, null); // startTime is null for instantaneous preview
     }
 
-    function playTick() {
+    // UPDATED: Accepts startTime for scheduling
+    function playTick(startTime = null) {
         initAudio();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
+        const now = startTime !== null ? startTime : audioCtx.currentTime;
+        
         osc.type = 'square';
-        osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        osc.frequency.setValueAtTime(1000, now);
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        
         osc.connect(gain);
         gain.connect(masterGain);
-        osc.start(audioCtx.currentTime);
-        osc.stop(audioCtx.currentTime + 0.05);
+        
+        osc.start(now);
+        osc.stop(now + 0.05);
+        
+        if (startTime !== null) scheduledAudioNodes.push(osc);
     }
 
     function playFinalAlarm(isPreview = false) {
@@ -256,7 +290,60 @@ document.addEventListener('DOMContentLoaded', () => {
         const typeSelect = document.getElementById('main-alarm-sound');
         const melodyType = typeSelect ? typeSelect.value : 'urgent';
         
-        playMelody(melodyType, duration);
+        playMelody(melodyType, duration); // startTime is null for instantaneous preview
+    }
+
+    // NEW: Pre-Scheduling Function
+    function scheduleTimerAudio(currentTimer) {
+        initAudio();
+        cancelScheduledAudio(); // Ensure clean slate before scheduling new audio
+
+        const now = audioCtx.currentTime;
+        const remainingSeconds = currentTimer.remaining;
+        
+        // 1. Pre-alert logic
+        const elFocusPre = document.getElementById('enable-focus-prealert');
+        const elRestPre = document.getElementById('enable-rest-prealert');
+        const elFocusPreTime = document.getElementById('focus-prealert-time');
+        const elRestPreTime = document.getElementById('rest-prealert-time');
+        
+        const focusPreAlertEnabled = elFocusPre ? elFocusPre.checked : false;
+        const restPreAlertEnabled = elRestPre ? elRestPre.checked : false;
+        
+        const focusPreAlertTime = elFocusPreTime ? (parseInt(elFocusPreTime.value) || 30) : 30;
+        const restPreAlertTime = elRestPreTime ? (parseInt(elRestPreTime.value) || 30) : 30;
+
+        const isFocus = currentTimer.type === 'work';
+        const isRest = currentTimer.type === 'rest';
+        
+        const preAlertEnabled = (isFocus && focusPreAlertEnabled) || (isRest && restPreAlertEnabled);
+        const preAlertTime = isFocus ? focusPreAlertTime : restPreAlertTime;
+
+        if (preAlertEnabled && remainingSeconds > preAlertTime) {
+            const timeUntilPreAlert = remainingSeconds - preAlertTime;
+            const typeSelect = document.getElementById('prealert-sound');
+            const melodyType = typeSelect ? typeSelect.value : 'chime';
+            playMelody(melodyType, null, now + timeUntilPreAlert);
+        }
+
+        // 2. Ticks logic (10 down to 1)
+        for (let i = 10; i > 0; i--) {
+            if (remainingSeconds > i) {
+                const timeUntilTick = remainingSeconds - i;
+                playTick(now + timeUntilTick);
+            }
+        }
+
+        // 3. Final Alarm logic
+        const enableMainAlarm = document.getElementById('enable-main-alarm');
+        if (enableMainAlarm && enableMainAlarm.checked) {
+            const durationInput = document.getElementById('alarm-duration');
+            const duration = durationInput ? (parseInt(durationInput.value) || 4) : 4;
+            const typeSelect = document.getElementById('main-alarm-sound');
+            const melodyType = typeSelect ? typeSelect.value : 'urgent';
+            
+            playMelody(melodyType, duration, now + remainingSeconds);
+        }
     }
 
     function formatTime(totalSeconds) {
@@ -318,6 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // UPDATED: Cleaned up tick() function
     function tick() {
         if (timers.length === 0) return;
         let current = timers[currentTimerIndex];
@@ -332,38 +420,11 @@ document.addEventListener('DOMContentLoaded', () => {
         current.remaining = newRemaining;
         renderTimers();
 
-        const elFocusPre = document.getElementById('enable-focus-prealert');
-        const elRestPre = document.getElementById('enable-rest-prealert');
-        const elFocusPreTime = document.getElementById('focus-prealert-time');
-        const elRestPreTime = document.getElementById('rest-prealert-time');
-        
-        const focusPreAlertEnabled = elFocusPre ? elFocusPre.checked : false;
-        const restPreAlertEnabled = elRestPre ? elRestPre.checked : false;
-        
-        const focusPreAlertTime = elFocusPreTime ? (parseInt(elFocusPreTime.value) || 30) : 30;
-        const restPreAlertTime = elRestPreTime ? (parseInt(elRestPreTime.value) || 30) : 30;
-
-        const isFocus = current.type === 'work';
-        const isRest = current.type === 'rest';
-        
-        const preAlertEnabled = (isFocus && focusPreAlertEnabled) || (isRest && restPreAlertEnabled);
-        const preAlertTime = isFocus ? focusPreAlertTime : restPreAlertTime;
-
-        if (preAlertEnabled && current.remaining === preAlertTime && !currentTimerState.hasPlayedPreAlert) {
-            playPreAlert();
-            currentTimerState.hasPlayedPreAlert = true;
-        }
-
-        if (current.remaining <= 10 && current.remaining > 0 && !currentTimerState.playedTicks.has(current.remaining)) {
-            playTick();
-            currentTimerState.playedTicks.add(current.remaining);
-        }
+        // Audio triggering logic removed from here, now handled by scheduleTimerAudio()
 
         if (current.remaining <= 0) {
-            playFinalAlarm();
             clearInterval(sequenceInterval);
             targetEndTime = null;
-            stopWhiteNoise();
             
             const durationInput = document.getElementById('alarm-duration');
             const duration = durationInput ? (parseInt(durationInput.value) || 4) : 4;
@@ -377,9 +438,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 resetTimerState();
                 if (isSequenceRunning) {
                     targetEndTime = Date.now() + timers[currentTimerIndex].remaining * 1000;
-                    sequenceInterval = setInterval(tick, 1000);
+                    sequenceInterval = setInterval(tick, 200);
                     renderTimers();
-                    manageWhiteNoiseState();
+                    manageBrownNoiseState();
+                    scheduleTimerAudio(timers[currentTimerIndex]); // NEW: Schedule next timer's audio
+                } else {
+                    manageBrownNoiseState();
                 }
             }, duration * 1000); // delay before switching to next to match alarm
         }
@@ -396,6 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(sequenceInterval);
             targetEndTime = null;
             disableKeepAlive();
+            cancelScheduledAudio(); // NEW: Cancel audio on pause
         } else {
             // Start from this timer
             isSequenceRunning = true;
@@ -405,10 +470,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             targetEndTime = Date.now() + timers[currentTimerIndex].remaining * 1000;
             clearInterval(sequenceInterval);
-            sequenceInterval = setInterval(tick, 1000);
+            sequenceInterval = setInterval(tick, 200);
             enableKeepAlive();
+            scheduleTimerAudio(timers[currentTimerIndex]); // NEW: Schedule audio on start
         }
-        manageWhiteNoiseState();
+        manageBrownNoiseState();
         renderTimers();
         updateGlobalControls();
     };
@@ -424,9 +490,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearInterval(sequenceInterval);
                 targetEndTime = null;
                 disableKeepAlive();
+                cancelScheduledAudio(); // NEW: Cancel audio on reset
             }
         }
-        manageWhiteNoiseState();
+        manageBrownNoiseState();
         renderTimers();
         updateGlobalControls();
     };
@@ -444,6 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentTimerIndex = 0;
             resetTimerState();
             disableKeepAlive();
+            cancelScheduledAudio(); // NEW: Cancel audio on delete
         } else if (currentTimerIndex === index) {
             isSequenceRunning = false;
             clearInterval(sequenceInterval);
@@ -453,10 +521,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             resetTimerState();
             disableKeepAlive();
+            cancelScheduledAudio(); // NEW: Cancel audio on delete
         } else if (currentTimerIndex > index) {
             currentTimerIndex--;
         }
-        manageWhiteNoiseState();
+        manageBrownNoiseState();
         renderTimers();
         updateGlobalControls();
     };
@@ -470,14 +539,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearInterval(sequenceInterval);
                 targetEndTime = null;
                 disableKeepAlive();
+                cancelScheduledAudio(); // NEW: Cancel audio on pause
             } else {
                 isSequenceRunning = true;
                 targetEndTime = Date.now() + timers[currentTimerIndex].remaining * 1000;
                 clearInterval(sequenceInterval);
-                sequenceInterval = setInterval(tick, 1000);
+                sequenceInterval = setInterval(tick, 200);
                 enableKeepAlive();
+                scheduleTimerAudio(timers[currentTimerIndex]); // NEW: Schedule audio on start
             }
-            manageWhiteNoiseState();
+            manageBrownNoiseState();
             renderTimers();
             updateGlobalControls();
         });
@@ -492,7 +563,8 @@ document.addEventListener('DOMContentLoaded', () => {
             resetTimerState();
             timers.forEach(t => t.remaining = t.total);
             disableKeepAlive();
-            manageWhiteNoiseState();
+            cancelScheduledAudio(); // NEW: Cancel audio on reset
+            manageBrownNoiseState();
             renderTimers();
             updateGlobalControls();
         });
@@ -520,7 +592,7 @@ document.addEventListener('DOMContentLoaded', () => {
             timers.push(newTimer);
             form.reset();
             document.getElementById('timer-type').value = type === 'work' ? 'rest' : 'work'; // Auto-toggle type for convenience
-            document.getElementById('timer-minutes').value = type === 'work' ? "5" : "25"; // Auto-suggest times
+            document.getElementById('timer-minutes').value = type === 'work' ? "10" : "50"; // Auto-suggest times
             document.getElementById('timer-seconds').value = "0";
             renderTimers();
             updateGlobalControls();
@@ -542,20 +614,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const enableWhiteNoiseCheckbox = document.getElementById('enable-white-noise');
-    if (enableWhiteNoiseCheckbox) {
-        enableWhiteNoiseCheckbox.addEventListener('change', () => {
-            manageWhiteNoiseState();
+    const enableBrownNoiseCheckbox = document.getElementById('enable-brown-noise');
+    if (enableBrownNoiseCheckbox) {
+        enableBrownNoiseCheckbox.addEventListener('change', () => {
+            manageBrownNoiseState();
         });
     }
 
-    const whiteNoiseVolumeSlider = document.getElementById('white-noise-volume');
-    const whiteNoiseVolumeValue = document.getElementById('white-noise-volume-value');
-    if (whiteNoiseVolumeSlider && whiteNoiseVolumeValue) {
-        whiteNoiseVolumeSlider.addEventListener('input', (e) => {
-            whiteNoiseVolumeValue.textContent = `${e.target.value}%`;
-            if (whiteNoiseGain) {
-                whiteNoiseGain.gain.value = parseInt(e.target.value) / 100;
+    const brownNoiseVolumeSlider = document.getElementById('brown-noise-volume');
+    const brownNoiseVolumeValue = document.getElementById('brown-noise-volume-value');
+    if (brownNoiseVolumeSlider && brownNoiseVolumeValue) {
+        brownNoiseVolumeSlider.addEventListener('input', (e) => {
+            brownNoiseVolumeValue.textContent = `${e.target.value}%`;
+            if (brownNoiseGain) {
+                brownNoiseGain.gain.value = parseInt(e.target.value) / 100;
             }
         });
     }
