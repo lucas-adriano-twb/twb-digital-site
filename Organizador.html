@@ -313,6 +313,10 @@
             color: var(--color-charcoal);
         }
         
+        .icon-btn.archive:hover {
+            color: var(--color-blue);
+        }
+
         .icon-btn.delete:hover {
             color: #d9534f;
         }
@@ -450,7 +454,6 @@
             try {
                 const response = await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
-                    // Enviar como text/plain evita requisição preflight OPTIONS de CORS
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
@@ -476,7 +479,7 @@
 
         window.onload = async () => {
             if(APP_SCRIPT_URL === 'SUA_URL_DO_WEB_APP_AQUI') {
-                alert("Por favor, configure a APP_SCRIPT_URL no código fonte HTML.");
+                alert("Por favor, configure a APP_SCRIPT_URL no código fonte HTML após a publicação no Apps Script.");
                 showLoader(false);
                 return;
             }
@@ -509,7 +512,6 @@
                 select.appendChild(option);
             });
 
-            // Restaura o valor se ele ainda existir na lista
             if (currentValue && state.categorias.includes(currentValue)) {
                 select.value = currentValue;
             }
@@ -529,7 +531,6 @@
                 const card = document.createElement('div');
                 card.className = `task-card ${t.concluida ? 'completed' : ''}`;
                 
-                // Formatação de data visual
                 let dataDisplay = '';
                 if(t.data) {
                     const [y, m, d] = t.data.split('-');
@@ -551,6 +552,7 @@
                     </div>
                     <div class="task-actions">
                         <button class="icon-btn" onclick="editTarefa('${t.id}')" title="Editar">✎</button>
+                        <button class="icon-btn archive" onclick="archiveTarefa('${t.id}')" title="Arquivar">📦</button>
                         <button class="icon-btn delete" onclick="deleteTarefa('${t.id}')" title="Excluir">🗑</button>
                     </div>
                 `;
@@ -588,13 +590,10 @@
             };
 
             if (id) {
-                // Modo Edição
                 await fetchAPI({ action: 'updateTarefa', data: { id, ...dataObj } });
-                // Atualiza estado local
                 const index = state.tarefas.findIndex(t => t.id === id);
                 state.tarefas[index] = { ...state.tarefas[index], ...dataObj };
             } else {
-                // Modo Criação
                 const res = await fetchAPI({ action: 'addTarefa', data: dataObj });
                 if(res) {
                     state.tarefas.push({ id: res.id, concluida: false, ...dataObj });
@@ -615,7 +614,6 @@
             document.getElementById('horario').value = t.horario;
             document.getElementById('tempo').value = t.tempo;
             
-            // Adiciona a categoria temporariamente ao select se ela foi desativada no banco
             const select = document.getElementById('categoria');
             if (!state.categorias.includes(t.categoria)) {
                 const option = document.createElement('option');
@@ -631,22 +629,37 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        async function deleteTarefa(id) {
-            if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
-            
-            await fetchAPI({ action: 'deleteTarefa', id: id });
-            state.tarefas = state.tarefas.filter(t => t.id !== id);
-            renderTarefas();
-        }
-
         async function toggleStatus(id, isChecked) {
-            // Atualiza UI instantaneamente (Optimistic UI Update)
             const index = state.tarefas.findIndex(t => t.id === id);
             state.tarefas[index].concluida = isChecked;
             renderTarefas(); 
-
-            // Confirma no backend em background
             await fetchAPI({ action: 'toggleConcluida', id: id, status: isChecked });
+        }
+
+        // ==========================================
+        // MIGRAÇÃO DE DADOS (ARQUIVO E LIXEIRA)
+        // ==========================================
+
+        async function archiveTarefa(id) {
+            if (!confirm("Arquivar esta tarefa? Ela sairá da tela principal e irá para a aba de Arquivadas no banco de dados.")) return;
+            
+            // UI Update Otimista
+            state.tarefas = state.tarefas.filter(t => t.id !== id);
+            renderTarefas();
+
+            // Execução Backend
+            await fetchAPI({ action: 'archiveTarefa', id: id });
+        }
+
+        async function deleteTarefa(id) {
+            if (!confirm("Enviar esta tarefa para a Lixeira?")) return;
+            
+            // UI Update Otimista
+            state.tarefas = state.tarefas.filter(t => t.id !== id);
+            renderTarefas();
+
+            // Execução Backend (O backend move para a aba Lixeira)
+            await fetchAPI({ action: 'deleteTarefa', id: id });
         }
 
         function clearForm() {
@@ -701,7 +714,6 @@
             renderCategorias();
         }
 
-        // Utilidade
         function showLoader(show) {
             document.getElementById('loader').classList.toggle('hidden', !show);
         }
