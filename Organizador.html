@@ -33,11 +33,13 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        body {
+        html, body {
             background-color: var(--color-bg);
             color: var(--color-text);
             line-height: 1.6;
             padding-bottom: 50px;
+            overflow-x: hidden; /* Trava de segurança contra vazamento horizontal no mobile */
+            width: 100%;
         }
 
         /* Header */
@@ -294,70 +296,6 @@
             border-color: var(--color-dark-blue);
         }
 
-        /* Visão Semanal (Calendário) */
-        .weekly-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .day-column {
-            background: var(--color-white);
-            border-radius: 12px;
-            padding: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            min-height: 150px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .day-column.today {
-            border: 2px solid var(--color-blue);
-            background-color: #f0f7ff;
-        }
-
-        .day-header {
-            text-align: center;
-            font-weight: 700;
-            font-size: 13px;
-            color: var(--color-dark-blue);
-            padding-bottom: 8px;
-            border-bottom: 1px dashed var(--color-gray);
-            margin-bottom: 5px;
-        }
-
-        .day-header span {
-            display: block;
-            font-size: 10px;
-            color: var(--color-dusty);
-            font-weight: 500;
-        }
-
-        .weekly-task {
-            font-size: 11px;
-            background: var(--color-bg);
-            padding: 8px;
-            border-radius: 6px;
-            border-left: 3px solid var(--color-blue);
-            line-height: 1.3;
-            color: var(--color-charcoal);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .weekly-task.completed {
-            border-left-color: var(--color-dusty);
-            opacity: 0.6;
-            text-decoration: line-through;
-        }
-
-        .weekly-task strong {
-            display: block;
-            margin-bottom: 3px;
-            color: var(--color-dark-blue);
-        }
-
         /* Listas e Accordion */
         .section-header {
             display: flex;
@@ -587,6 +525,74 @@
             font-weight: 600;
         }
 
+        /* Visão Semanal (Calendário) Repaginado */
+        .weekly-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px; /* Espaço maior entre colunas */
+            margin-bottom: 40px;
+        }
+
+        .day-column {
+            background: var(--color-white);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid var(--color-gray); /* Borda sólida pra dar cara de calendário */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            min-height: 200px; /* Mais alto, menos 'magrelo' */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .day-column.today {
+            border: 2px solid var(--color-blue);
+            background-color: #f4f8fc; /* Fundo sutil pro dia de hoje */
+        }
+
+        .day-header {
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--color-dark-blue);
+            padding: 10px;
+            background-color: var(--color-bg); /* Fundo preenchido no cabeçalho */
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        .day-header span {
+            display: block;
+            font-size: 11px;
+            color: var(--color-dusty);
+            font-weight: 600;
+            margin-top: 3px;
+        }
+
+        .weekly-task {
+            font-size: 12px;
+            background: var(--color-white);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--color-gray); /* Contorno no card */
+            border-left: 4px solid var(--color-blue); /* Fita lateral de destaque */
+            line-height: 1.4;
+            color: var(--color-charcoal);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .weekly-task.completed {
+            border-left-color: var(--color-dusty);
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .weekly-task strong {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--color-dark-blue);
+        }
+
         /* Modais Customizados */
         .modal-overlay {
             position: fixed;
@@ -683,9 +689,29 @@
 
         /* Responsividade para Celulares */
         @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            .form-card {
+                padding: 20px;
+            }
             .form-grid {
                 grid-template-columns: 1fr;
             }
+            
+            /* Ajuste de Prevenção de Overflow para o Seletor de Categoria */
+            .category-wrapper {
+                flex-wrap: wrap;
+            }
+            .category-wrapper select {
+                min-width: 100%;
+                margin-bottom: 8px;
+            }
+            .category-wrapper button {
+                flex: 1; /* Distribui os botões (+, -, ↺) igualmente na linha de baixo */
+                padding: 12px 0;
+            }
+
             .task-actions {
                 width: 100%; 
                 justify-content: flex-end; 
@@ -704,7 +730,7 @@
             }
             
             .day-column {
-                min-width: 220px;
+                min-width: 250px; /* Coluna um pouco mais larga pro celular */
                 scroll-snap-align: start;
             }
 
@@ -852,18 +878,6 @@
             </div>
         </div>
 
-        <!-- Visão Semanal (Calendário) -->
-        <div class="section-header" onclick="toggleSection('weeklyView', this)">
-            <div class="title-area">
-                Visão Semanal
-                <span class="badge-count" style="font-weight:normal;">Nesta Semana</span>
-            </div>
-            <span class="toggle-icon">▼</span>
-        </div>
-        <div class="weekly-grid" id="weeklyView">
-            <!-- Grid injetado via JS -->
-        </div>
-
         <!-- Tarefas Pendentes -->
         <div class="section-header" onclick="toggleSection('listaPendentes', this)">
             <div class="title-area">
@@ -886,6 +900,18 @@
         </div>
         <div class="task-list collapsed-list" id="listaConcluidas">
             <!-- Cards injetados via JS -->
+        </div>
+
+        <!-- Visão Semanal (Calendário) Movida para o fim -->
+        <div class="section-header" onclick="toggleSection('weeklyView', this)">
+            <div class="title-area">
+                Visão Semanal
+                <span class="badge-count" style="font-weight:normal;">Nesta Semana</span>
+            </div>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="weekly-grid" id="weeklyView">
+            <!-- Grid injetado via JS -->
         </div>
 
     </div>
@@ -1178,7 +1204,7 @@
         }
 
         // ==========================================
-        // VISÃO SEMANAL (NOVA)
+        // VISÃO SEMANAL (REVISADA)
         // ==========================================
 
         function renderWeeklyView(todayObj, todayStr) {
@@ -1196,8 +1222,12 @@
                 const currentDayStr = getLocalYYYYMMDD(currentDayObj);
                 const isToday = currentDayStr === todayStr;
 
-                // Busca tarefas que pertencem a este dia específico
-                const tasksForDay = state.tarefas.filter(t => t.data === currentDayStr);
+                // Busca tarefas que pertencem a este dia específico, respeitando os filtros de categoria
+                const tasksForDay = state.tarefas.filter(t => {
+                    if (t.data !== currentDayStr) return false;
+                    if (state.selectedCategoryFilters.length > 0 && !state.selectedCategoryFilters.includes(t.categoria)) return false;
+                    return true;
+                });
 
                 // Constrói a coluna
                 const col = document.createElement('div');
