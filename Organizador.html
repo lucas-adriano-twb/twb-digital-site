@@ -590,6 +590,29 @@
             color: var(--color-dark-blue);
         }
 
+        /* Drag and Drop Customizations */
+        .drag-handle {
+            cursor: grab;
+            color: var(--color-lilac);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-right: 10px;
+            transition: color 0.2s;
+        }
+        .drag-handle:hover {
+            color: var(--color-dark-blue);
+        }
+        .task-card.dragging {
+            opacity: 0.5;
+            border: 2px dashed var(--color-blue);
+            box-shadow: none;
+        }
+        .dnd-container {
+            min-height: 10px;
+        }
+
         /* Dashboard e Estatísticas */
         .dashboard-grid {
             display: grid;
@@ -853,8 +876,8 @@
     </div>
 
     <header>
-        <h1>Organizador Daiane</h1>
-        <p>❤️ Amor. Você é Capaz, Lembre-se disso! ❤️</p>
+        <h1>Meu Organizador</h1>
+        <p>Planeje seu dia com leveza e praticidade</p>
     </header>
 
     <div class="container">
@@ -1056,11 +1079,30 @@
             await loadData();
         };
 
+        // Função responsável por gerenciar a ordem local das tarefas
+        function saveLocalOrder() {
+            const order = state.tarefas.map(t => t.id);
+            localStorage.setItem('organizador_tarefas_order', JSON.stringify(order));
+        }
+
         async function loadData() {
             const data = await fetchAPI({ action: 'getInitData' });
             if (data) {
                 state.tarefas = data.tarefas;
                 state.categorias = data.categorias;
+
+                // Aplica a ordenação visual salva no navegador
+                const savedOrder = JSON.parse(localStorage.getItem('organizador_tarefas_order'));
+                if (savedOrder && Array.isArray(savedOrder)) {
+                    state.tarefas.sort((a, b) => {
+                        let idxA = savedOrder.indexOf(a.id);
+                        let idxB = savedOrder.indexOf(b.id);
+                        if (idxA === -1) idxA = Number.MAX_SAFE_INTEGER;
+                        if (idxB === -1) idxB = Number.MAX_SAFE_INTEGER;
+                        return idxA - idxB;
+                    });
+                }
+
                 renderCategorias();
                 renderTarefas();
             }
@@ -1089,6 +1131,24 @@
             if (m > 0) res.push(`${m}m`);
             return res.join(' ');
         }
+
+        function formatTimeValue(rawTime) {
+            if (!rawTime) return '';
+            if (typeof rawTime === 'string') {
+                if (rawTime.includes('T')) {
+                    const match = rawTime.match(/T(\d{2}:\d{2})/);
+                    return match ? match[1] : '';
+                }
+                if (/^\d{2}:\d{2}$/.test(rawTime)) {
+                    return rawTime;
+                }
+            }
+            return String(rawTime);
+        }
+
+        // ==========================================
+        // RENDERIZAÇÃO DA UI E LÓGICA
+        // ==========================================
 
         function renderCategorias() {
             const selectForm = document.getElementById('categoria');
@@ -1179,12 +1239,8 @@
                 }
 
                 let horaDisplay = '';
-                if (t.horario) {
-                    let horaLimpa = t.horario;
-                    if (typeof t.horario === 'string' && t.horario.includes('T')) {
-                        const match = t.horario.match(/T(\d{2}:\d{2})/);
-                        if (match) horaLimpa = match[1];
-                    }
+                let horaLimpa = formatTimeValue(t.horario);
+                if (horaLimpa) {
                     horaDisplay = `<span>⏰ ${horaLimpa}</span>`;
                 }
 
@@ -1199,6 +1255,7 @@
                 }
 
                 card.innerHTML = `
+                    <div class="drag-handle" title="Segure para arrastar">⋮⋮</div>
                     <div class="checkbox-wrapper">
                         <input type="checkbox" ${t.concluida ? 'checked' : ''} onchange="toggleStatus('${t.id}', this.checked)">
                     </div>
@@ -1218,6 +1275,21 @@
                     </div>
                 `;
 
+                // Configuração de Drag & Drop para o card
+                card.setAttribute('draggable', 'true');
+                card.dataset.id = t.id;
+                card.dataset.grupo = bucketTemporal;
+
+                card.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    card.dataset.origSibling = card.nextElementSibling ? card.nextElementSibling.dataset.id : 'null';
+                    setTimeout(() => card.classList.add('dragging'), 0);
+                });
+
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                });
+
                 if (t.concluida) {
                     listConcluidas.appendChild(card);
                     concluidasCount++;
@@ -1234,7 +1306,15 @@
                     tituloGrupo.className = 'sub-group-header';
                     tituloGrupo.textContent = grupo.label;
                     listPendentes.appendChild(tituloGrupo);
-                    grupo.items.forEach(card => listPendentes.appendChild(card));
+                    
+                    const groupWrapper = document.createElement('div');
+                    groupWrapper.className = 'dnd-container';
+                    groupWrapper.dataset.grupo = key;
+                    
+                    setupDnD(groupWrapper);
+                    
+                    grupo.items.forEach(card => groupWrapper.appendChild(card));
+                    listPendentes.appendChild(groupWrapper);
                 }
             });
 
@@ -1287,13 +1367,8 @@
                         const taskBlock = document.createElement('div');
                         taskBlock.className = `weekly-task ${t.concluida ? 'completed' : ''}`;
                         
-                        let horaLimpa = '';
-                        if (t.horario && typeof t.horario === 'string' && t.horario.includes('T')) {
-                            const match = t.horario.match(/T(\d{2}:\d{2})/);
-                            if (match) horaLimpa = ` - ${match[1]}`;
-                        } else if (t.horario) {
-                            horaLimpa = ` - ${t.horario}`;
-                        }
+                        let horaLimpa = formatTimeValue(t.horario);
+                        if (horaLimpa) horaLimpa = ` - ${horaLimpa}`;
 
                         taskBlock.innerHTML = `<strong>${t.tarefa}</strong><span style="color:var(--color-dusty); font-size:9px">${t.categoria}${horaLimpa}</span>`;
                         col.appendChild(taskBlock);
@@ -1469,6 +1544,7 @@
                     state.tarefas.push({ id: res.id, concluida: false, ...dataObj });
                 }
             }
+            saveLocalOrder();
             clearForm();
             renderTarefas();
         }
@@ -1480,7 +1556,7 @@
             document.getElementById('tarefaId').value = t.id;
             document.getElementById('tarefa').value = t.tarefa;
             document.getElementById('data').value = t.data;
-            document.getElementById('horario').value = t.horario;
+            document.getElementById('horario').value = formatTimeValue(t.horario);
             
             if (t.tempo && !isNaN(parseInt(t.tempo))) {
                 document.getElementById('tempoHoras').value = Math.floor(t.tempo / 60) || '';
@@ -1504,6 +1580,71 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // ==========================================
+        // SISTEMA DE DRAG AND DROP
+        // ==========================================
+
+        function setupDnD(container) {
+            container.addEventListener('dragover', e => {
+                e.preventDefault();
+                const draggable = document.querySelector('.dragging');
+                if (!draggable || draggable.dataset.grupo !== container.dataset.grupo) return;
+
+                const afterElement = getDragAfterElement(container, e.clientY);
+                if (afterElement == null) {
+                    container.appendChild(draggable);
+                } else {
+                    container.insertBefore(draggable, afterElement);
+                }
+            });
+
+            container.addEventListener('drop', async e => {
+                e.preventDefault();
+                const draggable = document.querySelector('.dragging');
+                if (!draggable || draggable.dataset.grupo !== container.dataset.grupo) return;
+
+                const draggedId = draggable.dataset.id;
+                const afterElement = getDragAfterElement(container, e.clientY);
+                const targetId = afterElement ? afterElement.dataset.id : 'null';
+
+                if (draggable.dataset.origSibling === targetId) return;
+
+                reorderState(draggedId, targetId);
+                
+                // Salvamento na memória local para evitar corromper o Google Sheets
+                saveLocalOrder();
+                
+                // Recarrega o componente visual integral para que todas as abas reflitam as novas posições
+                renderTarefas();
+            });
+        }
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.task-card:not(.dragging)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function reorderState(draggedId, targetId) {
+            const draggedIndex = state.tarefas.findIndex(t => t.id === draggedId);
+            if (draggedIndex === -1) return;
+            const [draggedTask] = state.tarefas.splice(draggedIndex, 1);
+
+            if (targetId && targetId !== 'null') {
+                const targetIndex = state.tarefas.findIndex(t => t.id === targetId);
+                state.tarefas.splice(targetIndex, 0, draggedTask);
+            } else {
+                state.tarefas.push(draggedTask);
+            }
+        }
+
         async function toggleStatus(id, isChecked) {
             const index = state.tarefas.findIndex(t => t.id === id);
             state.tarefas[index].concluida = isChecked;
@@ -1514,6 +1655,7 @@
         function archiveTarefa(id) {
             showModal("Arquivar Tarefa", "A tarefa sairá da lista e irá para a aba Arquivadas. Continuar?", "Arquivar", "btn-archive", async () => {
                 state.tarefas = state.tarefas.filter(t => t.id !== id);
+                saveLocalOrder();
                 renderTarefas();
                 await fetchAPI({ action: 'archiveTarefa', id: id });
             });
@@ -1522,6 +1664,7 @@
         function deleteTarefa(id) {
             showModal("Excluir Tarefa", "Enviar esta tarefa para a Lixeira? Ela será deletada após 30 dias.", "Sim, excluir", "btn-danger", async () => {
                 state.tarefas = state.tarefas.filter(t => t.id !== id);
+                saveLocalOrder();
                 renderTarefas();
                 await fetchAPI({ action: 'deleteTarefa', id: id });
             });
