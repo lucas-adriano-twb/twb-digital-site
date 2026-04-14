@@ -66,7 +66,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px; /* Expandido para utilizar melhor as laterais no Desktop */
             margin: 0 auto;
             padding: 0 20px;
         }
@@ -529,25 +529,25 @@
         .weekly-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 15px; /* Espaço maior entre colunas */
+            gap: 10px; /* Reduzido para melhor encaixe horizontal */
             margin-bottom: 40px;
         }
 
         .day-column {
             background: var(--color-white);
             border-radius: 12px;
-            padding: 12px;
-            border: 1px solid var(--color-gray); /* Borda sólida pra dar cara de calendário */
+            padding: 10px; /* Reduzido para aumentar área útil interna */
+            border: 1px solid var(--color-gray); 
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-            min-height: 200px; /* Mais alto, menos 'magrelo' */
+            min-height: 140px; /* Reduzido para corrigir o formato 'lápis' (proporção mais equilibrada) */
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .day-column.today {
             border: 2px solid var(--color-blue);
-            background-color: #f4f8fc; /* Fundo sutil pro dia de hoje */
+            background-color: #f4f8fc; 
         }
 
         .day-header {
@@ -555,8 +555,8 @@
             font-weight: 700;
             font-size: 14px;
             color: var(--color-dark-blue);
-            padding: 10px;
-            background-color: var(--color-bg); /* Fundo preenchido no cabeçalho */
+            padding: 8px; /* Ajuste no header para economizar altura */
+            background-color: var(--color-bg); 
             border-radius: 8px;
             margin-bottom: 5px;
         }
@@ -574,8 +574,8 @@
             background: var(--color-white);
             padding: 10px;
             border-radius: 8px;
-            border: 1px solid var(--color-gray); /* Contorno no card */
-            border-left: 4px solid var(--color-blue); /* Fita lateral de destaque */
+            border: 1px solid var(--color-gray); 
+            border-left: 4px solid var(--color-blue); 
             line-height: 1.4;
             color: var(--color-charcoal);
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
