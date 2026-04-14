@@ -38,7 +38,7 @@
             color: var(--color-text);
             line-height: 1.6;
             padding-bottom: 50px;
-            overflow-x: hidden; /* Trava de segurança contra vazamento horizontal no mobile */
+            overflow-x: hidden;
             width: 100%;
         }
 
@@ -66,7 +66,7 @@
         }
 
         .container {
-            max-width: 1000px; /* Expandido para utilizar melhor as laterais no Desktop */
+            max-width: 1280px; 
             margin: 0 auto;
             padding: 0 20px;
         }
@@ -78,7 +78,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             margin-bottom: 30px;
-            margin-top: -60px; /* Sobrepõe o header levemente */
+            margin-top: -60px; 
             position: relative;
             border-top: 4px solid var(--color-pink);
         }
@@ -376,7 +376,6 @@
             transform: translateY(-2px);
         }
 
-        /* Estilo Tarefa Atrasada */
         .task-card.overdue {
             background-color: var(--color-danger-bg);
             border-left-color: var(--color-danger-border);
@@ -448,7 +447,6 @@
             align-items: center;
         }
 
-        /* Estilo unificado para todas as etiquetas */
         .task-meta span {
             display: inline-flex;
             align-items: center;
@@ -462,7 +460,6 @@
             font-size: 12px;
         }
 
-        /* Diferenciar cor do badge de tempo quando está atrasada para manter legibilidade */
         .task-card.overdue .task-meta span {
             background-color: rgba(255, 255, 255, 0.7); 
         }
@@ -525,21 +522,21 @@
             font-weight: 600;
         }
 
-        /* Visão Semanal (Calendário) Repaginado */
+        /* Visão Semanal */
         .weekly-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 10px; /* Reduzido para melhor encaixe horizontal */
+            gap: 10px; 
             margin-bottom: 40px;
         }
 
         .day-column {
             background: var(--color-white);
             border-radius: 12px;
-            padding: 10px; /* Reduzido para aumentar área útil interna */
+            padding: 10px; 
             border: 1px solid var(--color-gray); 
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-            min-height: 140px; /* Reduzido para corrigir o formato 'lápis' (proporção mais equilibrada) */
+            min-height: 140px; 
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -555,7 +552,7 @@
             font-weight: 700;
             font-size: 14px;
             color: var(--color-dark-blue);
-            padding: 8px; /* Ajuste no header para economizar altura */
+            padding: 8px; 
             background-color: var(--color-bg); 
             border-radius: 8px;
             margin-bottom: 5px;
@@ -591,6 +588,108 @@
             display: block;
             margin-bottom: 3px;
             color: var(--color-dark-blue);
+        }
+
+        /* Dashboard e Estatísticas */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-card {
+            background: var(--color-white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border: 1px solid var(--color-gray);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-card h4 {
+            color: var(--color-dark-blue);
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-bottom: 1px solid var(--color-gray);
+            padding-bottom: 10px;
+        }
+
+        /* KPIs Container */
+        .kpi-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex: 1;
+        }
+
+        .kpi-box {
+            flex: 1;
+            background: var(--color-bg);
+            border: 1px solid var(--color-gray);
+            border-radius: 12px;
+            padding: 20px 10px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .kpi-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--color-blue);
+            margin-bottom: 5px;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-dusty);
+            text-transform: uppercase;
+        }
+
+        /* Progress Bars */
+        .stat-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 15px;
+        }
+
+        .stat-label {
+            width: 130px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-charcoal);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat-bar-bg {
+            flex: 1;
+            background: var(--color-bg);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid var(--color-gray);
+        }
+
+        .stat-bar-fill {
+            background: var(--color-periwinkle);
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease-out;
+        }
+
+        .stat-val {
+            width: 65px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-dusty);
         }
 
         /* Modais Customizados */
@@ -645,7 +744,6 @@
         .btn-archive { background-color: var(--color-blue); }
         .btn-archive:hover { background-color: #2b6ac4; }
 
-        /* Lista Inativas Modal */
         .inactive-cats {
             display: flex;
             flex-wrap: wrap;
@@ -669,7 +767,6 @@
             opacity: 0.8;
         }
 
-        /* Loading Overlay */
         #loader {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -687,30 +784,14 @@
             display: none !important;
         }
 
-        /* Responsividade para Celulares */
         @media (max-width: 768px) {
-            .container {
-                padding: 0 15px;
-            }
-            .form-card {
-                padding: 20px;
-            }
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
+            .container { padding: 0 15px; }
+            .form-card { padding: 20px; }
+            .form-grid { grid-template-columns: 1fr; }
             
-            /* Ajuste de Prevenção de Overflow para o Seletor de Categoria */
-            .category-wrapper {
-                flex-wrap: wrap;
-            }
-            .category-wrapper select {
-                min-width: 100%;
-                margin-bottom: 8px;
-            }
-            .category-wrapper button {
-                flex: 1; /* Distribui os botões (+, -, ↺) igualmente na linha de baixo */
-                padding: 12px 0;
-            }
+            .category-wrapper { flex-wrap: wrap; }
+            .category-wrapper select { min-width: 100%; margin-bottom: 8px; }
+            .category-wrapper button { flex: 1; padding: 12px 0; }
 
             .task-actions {
                 width: 100%; 
@@ -720,7 +801,6 @@
                 border-top: 1px dashed var(--color-gray); 
             }
             
-            /* Visão Semanal no Celular vira um Carrossel Horizontal */
             .weekly-grid {
                 display: flex;
                 overflow-x: auto;
@@ -729,23 +809,13 @@
                 gap: 15px;
             }
             
-            .day-column {
-                min-width: 250px; /* Coluna um pouco mais larga pro celular */
-                scroll-snap-align: start;
-            }
-
-            /* Estiliza scrollbar para mobile */
-            .weekly-grid::-webkit-scrollbar {
-                height: 6px;
-            }
-            .weekly-grid::-webkit-scrollbar-track {
-                background: var(--color-gray); 
-                border-radius: 10px;
-            }
-            .weekly-grid::-webkit-scrollbar-thumb {
-                background: var(--color-lilac); 
-                border-radius: 10px;
-            }
+            .day-column { min-width: 250px; scroll-snap-align: start; }
+            .weekly-grid::-webkit-scrollbar { height: 6px; }
+            .weekly-grid::-webkit-scrollbar-track { background: var(--color-gray); border-radius: 10px; }
+            .weekly-grid::-webkit-scrollbar-thumb { background: var(--color-lilac); border-radius: 10px; }
+            
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .kpi-container { flex-direction: column; }
         }
     </style>
 </head>
@@ -753,7 +823,7 @@
 
     <div id="loader">Carregando dados...</div>
 
-    <!-- Modal Customizado Base -->
+    <!-- Modais Base -->
     <div id="customModal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 id="modalTitle">Confirmação</h3>
@@ -765,22 +835,17 @@
         </div>
     </div>
 
-    <!-- Modal Reativar Categoria -->
+    <!-- Modal Reativar -->
     <div id="reactivateModal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Reativar Categoria</h3>
             <p>Clique em uma categoria usada recentemente para reativá-la:</p>
-            
-            <div id="inactiveCatsList" class="inactive-cats">
-                <!-- Preenchido via JS -->
-            </div>
-            
+            <div id="inactiveCatsList" class="inactive-cats"></div>
             <p style="margin-top:15px; font-size:12px; color:var(--color-dusty)">Ou digite o nome exato da categoria para restaurar manualmente:</p>
             <div style="display:flex; gap:10px;">
                 <input type="text" id="manualReactivateInput" placeholder="Nome exato da categoria">
                 <button class="btn-submit" style="margin-top:0; padding:10px;" onclick="reactivateManual()">Reativar</button>
             </div>
-
             <div class="modal-actions">
                 <button class="action-btn" onclick="closeReactivateModal()">Fechar</button>
             </div>
@@ -794,7 +859,7 @@
 
     <div class="container">
         
-        <!-- Formulário de Tarefa -->
+        <!-- Formulário -->
         <div class="form-card">
             <div class="form-title">
                 <span id="formActionTitle">Nova Tarefa</span>
@@ -856,7 +921,7 @@
             </form>
         </div>
 
-        <!-- Seção de Filtros Globais (Nova estrutura Multi-select) -->
+        <!-- Filtros Globais (Listas) -->
         <div class="filter-section">
             <div style="display: flex; gap: 10px; align-items: center;">
                 <label>Prazo:</label>
@@ -872,13 +937,11 @@
             
             <div>
                 <label style="margin-bottom: 8px; display: block;">Filtrar Múltiplas Categorias:</label>
-                <div id="categoryFilters" class="filter-chips">
-                    <!-- Chips injetados via JS -->
-                </div>
+                <div id="categoryFilters" class="filter-chips"></div>
             </div>
         </div>
 
-        <!-- Tarefas Pendentes -->
+        <!-- Pendentes -->
         <div class="section-header" onclick="toggleSection('listaPendentes', this)">
             <div class="title-area">
                 Pendentes (Lista)
@@ -886,11 +949,9 @@
             </div>
             <span class="toggle-icon">▼</span>
         </div>
-        <div class="task-list" id="listaPendentes">
-            <!-- Cards injetados via JS -->
-        </div>
+        <div class="task-list" id="listaPendentes"></div>
 
-        <!-- Tarefas Concluídas -->
+        <!-- Concluídas -->
         <div class="section-header" onclick="toggleSection('listaConcluidas', this)">
             <div class="title-area">
                 Concluídas
@@ -898,11 +959,9 @@
             </div>
             <span class="toggle-icon rotated">▼</span>
         </div>
-        <div class="task-list collapsed-list" id="listaConcluidas">
-            <!-- Cards injetados via JS -->
-        </div>
+        <div class="task-list collapsed-list" id="listaConcluidas"></div>
 
-        <!-- Visão Semanal (Calendário) Movida para o fim -->
+        <!-- Visão Semanal -->
         <div class="section-header" onclick="toggleSection('weeklyView', this)">
             <div class="title-area">
                 Visão Semanal
@@ -910,38 +969,54 @@
             </div>
             <span class="toggle-icon">▼</span>
         </div>
-        <div class="weekly-grid" id="weeklyView">
-            <!-- Grid injetado via JS -->
+        <div class="weekly-grid" id="weeklyView"></div>
+
+        <!-- Dashboard e Estatísticas -->
+        <div class="section-header" onclick="toggleSection('dashboardView', this)">
+            <div class="title-area">
+                Dashboard e Estatísticas
+                <span class="badge-count" style="font-weight:normal;">Produtividade</span>
+            </div>
+            <span class="toggle-icon rotated">▼</span>
+        </div>
+        <div id="dashboardView" class="collapsed-list">
+            <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+                <span style="font-size: 12px; font-weight: 600; color: var(--color-dusty); text-transform: uppercase;">Período Analisado:</span>
+                <select id="dashboardPeriodFilter" onchange="renderDashboard()" style="padding: 8px 12px; border-radius: 8px; font-size: 13px; background-color: var(--color-white); border: 1px solid var(--color-gray);">
+                    <option value="hoje">Hoje</option>
+                    <option value="semana" selected>Esta Semana</option>
+                    <option value="mes">Este Mês</option>
+                    <option value="all">Todo o Período</option>
+                </select>
+            </div>
+            
+            <div class="dashboard-grid">
+                <!-- Card 1: Produtividade Agregada -->
+                <div class="dashboard-card" id="dashTaskStats"></div>
+                <!-- Card 2: Horas por Matéria -->
+                <div class="dashboard-card" id="dashTimeStats"></div>
+            </div>
         </div>
 
     </div>
 
     <script>
-        // =========================================================
-        // URL DO GOOGLE APPS SCRIPT
-        // =========================================================
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBDmm4skxObab4KsC1NgKpSqnV9hCH-_-tGKyXy8J2s32OpRcElmlzd5R9RTfQxIlByw/exec'; 
 
-        // Estado local
         let state = {
             tarefas: [],
             categorias: [],
-            selectedCategoryFilters: [] // Armazena array de categorias selecionadas no filtro
+            selectedCategoryFilters: [] 
         };
 
-        // ==========================================
-        // SISTEMA DE MODAL BASE
-        // ==========================================
         let modalCallback = null;
 
         function showModal(title, message, btnText, btnClass, callback) {
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalMessage').textContent = message;
-            
             const confirmBtn = document.getElementById('modalConfirmBtn');
             confirmBtn.textContent = btnText;
             confirmBtn.className = 'btn-submit ' + btnClass;
-            
             modalCallback = callback;
             document.getElementById('customModal').classList.remove('hidden');
         }
@@ -956,10 +1031,6 @@
             closeModal();
         });
 
-        // ==========================================
-        // COMUNICAÇÃO COM O BACKEND
-        // ==========================================
-
         async function fetchAPI(payload) {
             showLoader(true);
             try {
@@ -969,23 +1040,17 @@
                     body: JSON.stringify(payload)
                 });
                 const result = await response.json();
-                
                 if(result.status === 'error') {
                     showModal('Erro', result.message, 'OK', '', () => {});
                 }
-                
                 showLoader(false);
                 return result.data;
             } catch (error) {
                 showLoader(false);
-                showModal('Erro de Conexão', 'Não foi possível conectar. Tente novamente.', 'OK', '', () => {});
+                showModal('Erro de Conexão', 'Não foi possível conectar.', 'OK', '', () => {});
                 console.error(error);
             }
         }
-
-        // ==========================================
-        // INICIALIZAÇÃO
-        // ==========================================
 
         window.onload = async () => {
             await loadData();
@@ -1001,11 +1066,6 @@
             }
         }
 
-        // ==========================================
-        // UTILIDADES DE DATA
-        // ==========================================
-
-        // Converte Date object para formato YYYY-MM-DD
         function getLocalYYYYMMDD(dateObj) {
             const year = dateObj.getFullYear();
             const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -1013,44 +1073,43 @@
             return `${year}-${month}-${day}`;
         }
 
-        // Descobre a segunda-feira da semana atual
         function getStartOfWeek(date) {
             const d = new Date(date);
             const day = d.getDay();
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // ajusta quando o dia é domingo
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
             return new Date(d.setDate(diff));
         }
 
-        // ==========================================
-        // RENDERIZAÇÃO DA UI E LÓGICA
-        // ==========================================
+        function formatMinutesToHours(minutes) {
+            if (!minutes || isNaN(minutes) || minutes <= 0) return "0m";
+            const h = Math.floor(minutes / 60);
+            const m = minutes % 60;
+            let res = [];
+            if (h > 0) res.push(`${h}h`);
+            if (m > 0) res.push(`${m}m`);
+            return res.join(' ');
+        }
 
         function renderCategorias() {
             const selectForm = document.getElementById('categoria');
             const chipsContainer = document.getElementById('categoryFilters');
-            
             const currentFormValue = selectForm.value;
             
             selectForm.innerHTML = '<option value="" disabled selected>Selecione...</option>';
-            chipsContainer.innerHTML = ''; // Limpa os chips
+            chipsContainer.innerHTML = ''; 
 
-            // Filtra o array de state para garantir que só existam chips de categorias validas
             state.selectedCategoryFilters = state.selectedCategoryFilters.filter(c => state.categorias.includes(c));
 
             state.categorias.forEach(cat => {
-                // Popula Dropdown do Formulário
                 const optionF = document.createElement('option');
                 optionF.value = cat;
                 optionF.textContent = cat;
                 selectForm.appendChild(optionF);
 
-                // Constrói os Chips de Filtro Múltiplo
                 const chip = document.createElement('div');
                 chip.className = `filter-chip ${state.selectedCategoryFilters.includes(cat) ? 'active' : ''}`;
                 chip.textContent = cat;
-                chip.onclick = () => {
-                    toggleCategoryFilter(cat);
-                };
+                chip.onclick = () => { toggleCategoryFilter(cat); };
                 chipsContainer.appendChild(chip);
             });
 
@@ -1062,28 +1121,23 @@
         function toggleCategoryFilter(cat) {
             const index = state.selectedCategoryFilters.indexOf(cat);
             if (index > -1) {
-                state.selectedCategoryFilters.splice(index, 1); // Remove
+                state.selectedCategoryFilters.splice(index, 1); 
             } else {
-                state.selectedCategoryFilters.push(cat); // Adiciona
+                state.selectedCategoryFilters.push(cat); 
             }
-            renderCategorias(); // Atualiza visual dos chips
-            renderTarefas(); // Aplica o filtro nas tarefas
+            renderCategorias(); 
+            renderTarefas(); 
         }
 
         function renderTarefas() {
             const listPendentes = document.getElementById('listaPendentes');
             const listConcluidas = document.getElementById('listaConcluidas');
-            
             listPendentes.innerHTML = '';
             listConcluidas.innerHTML = '';
 
-            // Capta valores do filtro de data
             const dateFilter = document.getElementById('filterDate').value;
-            
-            // Datas Locais Referenciais
             const todayObj = new Date();
             const todayStr = getLocalYYYYMMDD(todayObj);
-            
             const tomorrowObj = new Date(todayObj);
             tomorrowObj.setDate(tomorrowObj.getDate() + 1);
             const tomorrowStr = getLocalYYYYMMDD(tomorrowObj);
@@ -1100,7 +1154,6 @@
             };
 
             state.tarefas.forEach(t => {
-                // Classificação Temporal
                 let bucketTemporal = 'semData';
                 if (t.data) {
                     if (t.data < todayStr) bucketTemporal = 'atrasadas';
@@ -1109,9 +1162,7 @@
                     else bucketTemporal = 'futuro';
                 }
 
-                // Aplicação dos Filtros Múltiplos (Lógica AND)
                 if (state.selectedCategoryFilters.length > 0 && !state.selectedCategoryFilters.includes(t.categoria)) return; 
-                // Aplicação do Filtro de Data
                 if (dateFilter !== 'all' && bucketTemporal !== dateFilter) return; 
 
                 const card = document.createElement('div');
@@ -1141,12 +1192,7 @@
                 if (t.tempo) {
                     let totalMinutos = parseInt(t.tempo);
                     if (!isNaN(totalMinutos) && totalMinutos > 0) {
-                        const h = Math.floor(totalMinutos / 60);
-                        const m = totalMinutos % 60;
-                        let textTempo = [];
-                        if (h > 0) textTempo.push(`${h}h`);
-                        if (m > 0) textTempo.push(`${m}m`);
-                        tempoDisplay = `<span>⏳ ${textTempo.join(' ')}</span>`;
+                        tempoDisplay = `<span>⏳ ${formatMinutesToHours(totalMinutos)}</span>`;
                     } else if (isNaN(totalMinutos) && typeof t.tempo === 'string') {
                         tempoDisplay = `<span>⏳ ${t.tempo}</span>`;
                     }
@@ -1181,7 +1227,6 @@
                 }
             });
 
-            // Injeção Agrupada na DOM para Pendentes
             ['atrasadas', 'hoje', 'amanha', 'futuro', 'semData'].forEach(key => {
                 const grupo = gruposPendentes[key];
                 if (grupo.items.length > 0) {
@@ -1199,22 +1244,17 @@
             document.getElementById('countPendentes').textContent = pendentesCount;
             document.getElementById('countConcluidas').textContent = concluidasCount;
 
-            // Renderiza Visão Semanal separadamente
             renderWeeklyView(todayObj, todayStr);
+            renderDashboard(); 
         }
-
-        // ==========================================
-        // VISÃO SEMANAL (REVISADA)
-        // ==========================================
 
         function renderWeeklyView(todayObj, todayStr) {
             const weeklyContainer = document.getElementById('weeklyView');
             weeklyContainer.innerHTML = '';
 
-            const startOfWeek = getStartOfWeek(todayObj); // Segunda-feira
+            const startOfWeek = getStartOfWeek(todayObj); 
             const daysOfWeekNames = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
-            // Itera de 0 (Seg) a 6 (Dom)
             for (let i = 0; i < 7; i++) {
                 const currentDayObj = new Date(startOfWeek);
                 currentDayObj.setDate(startOfWeek.getDate() + i);
@@ -1222,18 +1262,15 @@
                 const currentDayStr = getLocalYYYYMMDD(currentDayObj);
                 const isToday = currentDayStr === todayStr;
 
-                // Busca tarefas que pertencem a este dia específico, respeitando os filtros de categoria
                 const tasksForDay = state.tarefas.filter(t => {
                     if (t.data !== currentDayStr) return false;
                     if (state.selectedCategoryFilters.length > 0 && !state.selectedCategoryFilters.includes(t.categoria)) return false;
                     return true;
                 });
 
-                // Constrói a coluna
                 const col = document.createElement('div');
                 col.className = `day-column ${isToday ? 'today' : ''}`;
                 
-                // Formatação do Header do Dia
                 const formatedDateStr = `${String(currentDayObj.getDate()).padStart(2, '0')}/${String(currentDayObj.getMonth() + 1).padStart(2, '0')}`;
                 
                 col.innerHTML = `
@@ -1250,7 +1287,6 @@
                         const taskBlock = document.createElement('div');
                         taskBlock.className = `weekly-task ${t.concluida ? 'completed' : ''}`;
                         
-                        // Extrai hora higienizada para visualização
                         let horaLimpa = '';
                         if (t.horario && typeof t.horario === 'string' && t.horario.includes('T')) {
                             const match = t.horario.match(/T(\d{2}:\d{2})/);
@@ -1263,14 +1299,103 @@
                         col.appendChild(taskBlock);
                     });
                 }
-
                 weeklyContainer.appendChild(col);
             }
         }
 
-        // ==========================================
-        // GESTÃO AVANÇADA DE CATEGORIAS (REATIVAR)
-        // ==========================================
+        // Nova Lógica do Dashboard: Isolada de Filtros Globais, focada em Produtividade
+        function renderDashboard() {
+            const period = document.getElementById('dashboardPeriodFilter').value;
+            const containerTasks = document.getElementById('dashTaskStats');
+            const containerTime = document.getElementById('dashTimeStats');
+            
+            const todayObj = new Date();
+            const todayStr = getLocalYYYYMMDD(todayObj);
+            const startOfWeekObj = getStartOfWeek(todayObj);
+            const startOfWeekStr = getLocalYYYYMMDD(startOfWeekObj);
+            const endOfWeekObj = new Date(startOfWeekObj);
+            endOfWeekObj.setDate(endOfWeekObj.getDate() + 6);
+            const endOfWeekStr = getLocalYYYYMMDD(endOfWeekObj);
+            const startOfMonthStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth()+1).padStart(2,'0')}-01`;
+            const endOfMonthObj = new Date(todayObj.getFullYear(), todayObj.getMonth() + 1, 0);
+            const endOfMonthStr = getLocalYYYYMMDD(endOfMonthObj);
+
+            // Escopo Exclusivo do Dashboard: Apenas tarefas CONCLUÍDAS são relevantes para a produtividade real
+            let productivityTasks = state.tarefas.filter(t => {
+                if (!t.concluida) return false; 
+                if (!t.data) return period === 'all';
+                if (period === 'hoje') return t.data === todayStr;
+                if (period === 'semana') return t.data >= startOfWeekStr && t.data <= endOfWeekStr;
+                if (period === 'mes') return t.data >= startOfMonthStr && t.data <= endOfMonthStr;
+                return true;
+            });
+
+            let totalMinutosGeral = 0;
+            let diasUnicos = new Set();
+            const tempoPorCategoria = {};
+            let maxTempoCategoria = 0;
+
+            productivityTasks.forEach(t => {
+                if (t.data) diasUnicos.add(t.data);
+                
+                if (t.tempo && !isNaN(parseInt(t.tempo))) {
+                    const mins = parseInt(t.tempo);
+                    totalMinutosGeral += mins;
+                    if (!tempoPorCategoria[t.categoria]) tempoPorCategoria[t.categoria] = 0;
+                    tempoPorCategoria[t.categoria] += mins;
+                }
+            });
+
+            const diasProdutivos = diasUnicos.size;
+            const mediaMinutosPorDia = diasProdutivos > 0 ? Math.round(totalMinutosGeral / diasProdutivos) : 0;
+
+            // Card 1: KPIs de Produtividade (Substitui Status Concluídas vs Pendentes)
+            containerTasks.innerHTML = `
+                <h4>Visão Geral</h4>
+                <div class="kpi-container">
+                    <div class="kpi-box">
+                        <span class="kpi-value">${formatMinutesToHours(totalMinutosGeral)}</span>
+                        <span class="kpi-label">Tempo Total</span>
+                    </div>
+                    <div class="kpi-box">
+                        <span class="kpi-value">${diasProdutivos}</span>
+                        <span class="kpi-label">Dias Ativos</span>
+                    </div>
+                    <div class="kpi-box">
+                        <span class="kpi-value">${formatMinutesToHours(mediaMinutosPorDia)}</span>
+                        <span class="kpi-label">Média / Dia</span>
+                    </div>
+                </div>
+            `;
+
+            // Card 2: Horas de Estudo/Trabalho por Matéria
+            const arrayCategorias = Object.keys(tempoPorCategoria).map(cat => {
+                const tempo = tempoPorCategoria[cat];
+                if (tempo > maxTempoCategoria) maxTempoCategoria = tempo;
+                return { nome: cat, tempo: tempo };
+            }).sort((a, b) => b.tempo - a.tempo);
+
+            let timeStatsHTML = `<h4>Horas por Matéria</h4>`;
+            
+            if (arrayCategorias.length === 0) {
+                timeStatsHTML += `<p style="font-size:13px; color:var(--color-dusty); margin-top:20px; text-align:center;">Nenhuma atividade com tempo registrado foi concluída neste período.</p>`;
+            } else {
+                arrayCategorias.forEach(cat => {
+                    const flexPercent = maxTempoCategoria === 0 ? 0 : Math.round((cat.tempo / maxTempoCategoria) * 100);
+                    timeStatsHTML += `
+                        <div class="stat-row">
+                            <span class="stat-label" title="${cat.nome}">${cat.nome}</span>
+                            <div class="stat-bar-bg">
+                                <div class="stat-bar-fill" style="width: ${flexPercent}%"></div>
+                            </div>
+                            <span class="stat-val">${formatMinutesToHours(cat.tempo)}</span>
+                        </div>
+                    `;
+                });
+            }
+
+            containerTime.innerHTML = timeStatsHTML;
+        }
 
         function openReactivateModal() {
             const modal = document.getElementById('reactivateModal');
@@ -1278,7 +1403,6 @@
             document.getElementById('manualReactivateInput').value = '';
             listContainer.innerHTML = '';
 
-            // Detecta categorias inativas procurando nas tarefas atuais (que não estão no array de ativas)
             const todasCategoriasEmUso = [...new Set(state.tarefas.map(t => t.categoria))];
             const categoriasInativasDetectadas = todasCategoriasEmUso.filter(c => c && !state.categorias.includes(c));
 
@@ -1293,7 +1417,6 @@
                     listContainer.appendChild(chip);
                 });
             }
-
             modal.classList.remove('hidden');
         }
 
@@ -1308,33 +1431,21 @@
 
         async function executeReactivate(nome) {
             closeReactivateModal();
-            // O Apps Script identifica que ela existe e vai mudar a coluna pra TRUE.
-            // Se ela não existir de verdade, ele criará uma nova, o que atende perfeitamente.
             await fetchAPI({ action: 'addCategoria', nome: nome });
-            
-            if (!state.categorias.includes(nome)) {
-                state.categorias.push(nome);
-            }
-            
+            if (!state.categorias.includes(nome)) state.categorias.push(nome);
             renderCategorias();
             showModal("Sucesso", `A categoria "${nome}" foi restaurada e está pronta para uso!`, "Legal", "", () => {});
         }
 
-        // ==========================================
-        // LÓGICA DE TAREFAS (AÇÕES)
-        // ==========================================
-
         function toggleSection(listId, headerElement) {
             const list = document.getElementById(listId);
             const icon = headerElement.querySelector('.toggle-icon');
-            
             list.classList.toggle('collapsed-list');
             icon.classList.toggle('rotated');
         }
 
         async function submitTarefa(e) {
             e.preventDefault();
-            
             const id = document.getElementById('tarefaId').value;
             const inputHoras = parseInt(document.getElementById('tempoHoras').value) || 0;
             const inputMinutos = parseInt(document.getElementById('tempoMinutos').value) || 0;
@@ -1358,7 +1469,6 @@
                     state.tarefas.push({ id: res.id, concluida: false, ...dataObj });
                 }
             }
-
             clearForm();
             renderTarefas();
         }
@@ -1388,7 +1498,6 @@
                 select.appendChild(option);
             }
             select.value = t.categoria;
-
             document.getElementById('formActionTitle').textContent = "Editar Tarefa";
             document.getElementById('btnSubmit').textContent = "Atualizar Tarefa";
             document.getElementById('tarefa').focus();
@@ -1403,31 +1512,19 @@
         }
 
         function archiveTarefa(id) {
-            showModal(
-                "Arquivar Tarefa", 
-                "A tarefa sairá da lista e irá para a aba Arquivadas. Continuar?", 
-                "Arquivar", 
-                "btn-archive",
-                async () => {
-                    state.tarefas = state.tarefas.filter(t => t.id !== id);
-                    renderTarefas();
-                    await fetchAPI({ action: 'archiveTarefa', id: id });
-                }
-            );
+            showModal("Arquivar Tarefa", "A tarefa sairá da lista e irá para a aba Arquivadas. Continuar?", "Arquivar", "btn-archive", async () => {
+                state.tarefas = state.tarefas.filter(t => t.id !== id);
+                renderTarefas();
+                await fetchAPI({ action: 'archiveTarefa', id: id });
+            });
         }
 
         function deleteTarefa(id) {
-            showModal(
-                "Excluir Tarefa", 
-                "Enviar esta tarefa para a Lixeira? Ela será deletada após 30 dias.", 
-                "Sim, excluir", 
-                "btn-danger",
-                async () => {
-                    state.tarefas = state.tarefas.filter(t => t.id !== id);
-                    renderTarefas();
-                    await fetchAPI({ action: 'deleteTarefa', id: id });
-                }
-            );
+            showModal("Excluir Tarefa", "Enviar esta tarefa para a Lixeira? Ela será deletada após 30 dias.", "Sim, excluir", "btn-danger", async () => {
+                state.tarefas = state.tarefas.filter(t => t.id !== id);
+                renderTarefas();
+                await fetchAPI({ action: 'deleteTarefa', id: id });
+            });
         }
 
         function clearForm() {
@@ -1448,15 +1545,9 @@
         async function saveNewCategory() {
             const input = document.getElementById('novaCategoriaInput');
             const nome = input.value.trim();
-            
             if (!nome) return;
-
             await fetchAPI({ action: 'addCategoria', nome: nome });
-            
-            if (!state.categorias.includes(nome)) {
-                state.categorias.push(nome);
-            }
-            
+            if (!state.categorias.includes(nome)) state.categorias.push(nome);
             renderCategorias();
             document.getElementById('categoria').value = nome;
             input.value = '';
@@ -1466,29 +1557,20 @@
         function removeCurrentCategory() {
             const select = document.getElementById('categoria');
             const nome = select.value;
-            
             if(!nome) {
                 showModal("Aviso", "Selecione uma categoria para desativar.", "Entendi", "", () => {});
                 return;
             }
-
-            showModal(
-                "Desativar Categoria", 
-                `Desativar a categoria "${nome}"? Tarefas antigas não serão afetadas.`, 
-                "Sim, desativar", 
-                "btn-danger",
-                async () => {
-                    await fetchAPI({ action: 'desativarCategoria', nome: nome });
-                    state.categorias = state.categorias.filter(c => c !== nome);
-                    renderCategorias();
-                }
-            );
+            showModal("Desativar Categoria", `Desativar a categoria "${nome}"? Tarefas antigas não serão afetadas.`, "Sim, desativar", "btn-danger", async () => {
+                await fetchAPI({ action: 'desativarCategoria', nome: nome });
+                state.categorias = state.categorias.filter(c => c !== nome);
+                renderCategorias();
+            });
         }
 
         function showLoader(show) {
             document.getElementById('loader').classList.toggle('hidden', !show);
         }
-
     </script>
 </body>
 </html>
