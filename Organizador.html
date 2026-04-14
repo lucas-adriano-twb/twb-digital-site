@@ -201,6 +201,46 @@
             justify-content: space-between;
         }
 
+        /* Novas classes para o Accordion (Colapsar abas) */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            padding: 10px 0;
+            border-bottom: 2px solid var(--color-gray);
+            margin-bottom: 15px;
+            transition: opacity 0.2s;
+        }
+        
+        .section-header:hover {
+            opacity: 0.7;
+        }
+
+        .section-header .title-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-charcoal);
+        }
+
+        .toggle-icon {
+            font-size: 14px;
+            color: var(--color-dusty);
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.rotated {
+            transform: rotate(-90deg);
+        }
+
+        .collapsed-list {
+            display: none !important;
+        }
+
         .task-list {
             display: flex;
             flex-direction: column;
@@ -214,7 +254,7 @@
             padding: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.03);
             display: flex;
-            align-items: center;
+            align-items: flex-start; /* Ajustado para impedir desalinhamento em títulos com quebra de linha */
             gap: 15px;
             border-left: 5px solid var(--color-blue);
             transition: transform 0.2s;
@@ -266,8 +306,14 @@
             transform: translate(-50%, -50%);
         }
 
+        .checkbox-wrapper {
+            flex-shrink: 0; /* Impede que o checkbox seja esmagado em telas pequenas */
+            margin-top: 2px;
+        }
+
         .task-content {
             flex: 1;
+            min-width: 0; /* Permite que o texto quebre corretamente sem expandir e vazar do flex-container */
         }
 
         .task-title {
@@ -281,8 +327,34 @@
             font-size: 13px;
             color: var(--color-charcoal);
             display: flex;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        .task-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap; /* Impede que o ícone se descole do valor numérico */
+        }
+
+        .badge {
+            background-color: var(--color-bg);
+            color: var(--color-dusty);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: normal; /* Permite que títulos de categorias muito longas quebrem sem forçar o card */
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0; /* Impede que os botões de ação sejam esmagados */
         }
 
         .badge {
@@ -414,20 +486,26 @@
         </div>
 
         <!-- Tarefas Pendentes -->
-        <div class="section-title">
-            Pendentes
-            <span class="badge" id="countPendentes">0</span>
+        <div class="section-header" onclick="toggleSection('listaPendentes', this)">
+            <div class="title-area">
+                Pendentes
+                <span class="badge" id="countPendentes">0</span>
+            </div>
+            <span class="toggle-icon">▼</span>
         </div>
         <div class="task-list" id="listaPendentes">
             <!-- Cards injetados via JS -->
         </div>
 
         <!-- Tarefas Concluídas -->
-        <div class="section-title">
-            Concluídas
-            <span class="badge" id="countConcluidas">0</span>
+        <div class="section-header" onclick="toggleSection('listaConcluidas', this)">
+            <div class="title-area">
+                Concluídas
+                <span class="badge" id="countConcluidas">0</span>
+            </div>
+            <span class="toggle-icon rotated">▼</span>
         </div>
-        <div class="task-list" id="listaConcluidas">
+        <div class="task-list collapsed-list" id="listaConcluidas">
             <!-- Cards injetados via JS -->
         </div>
 
@@ -534,8 +612,21 @@
                 let dataDisplay = '';
                 if(t.data) {
                     const [y, m, d] = t.data.split('-');
-                    dataDisplay = `📅 ${d}/${m}`;
+                    dataDisplay = `<span>📅 ${d}/${m}</span>`;
                 }
+
+                // Higienização da string ISO gerada pelo epoch time do Google Sheets
+                let horaDisplay = '';
+                if (t.horario) {
+                    let horaLimpa = t.horario;
+                    if (typeof t.horario === 'string' && t.horario.includes('T')) {
+                        const match = t.horario.match(/T(\d{2}:\d{2})/);
+                        if (match) horaLimpa = match[1];
+                    }
+                    horaDisplay = `<span>⏰ ${horaLimpa}</span>`;
+                }
+
+                let tempoDisplay = t.tempo ? `<span>⏳ ${t.tempo}</span>` : '';
 
                 card.innerHTML = `
                     <div class="checkbox-wrapper">
@@ -545,9 +636,9 @@
                         <div class="task-title">${t.tarefa}</div>
                         <div class="task-meta">
                             <span class="badge">${t.categoria}</span>
-                            ${dataDisplay ? `<span>${dataDisplay}</span>` : ''}
-                            ${t.horario ? `<span>⏰ ${t.horario}</span>` : ''}
-                            ${t.tempo ? `<span>⏳ ${t.tempo}</span>` : ''}
+                            ${dataDisplay}
+                            ${horaDisplay}
+                            ${tempoDisplay}
                         </div>
                     </div>
                     <div class="task-actions">
@@ -571,6 +662,15 @@
 
             document.getElementById('countPendentes').textContent = pendentesCount;
             document.getElementById('countConcluidas').textContent = concluidasCount;
+        }
+
+        // Função para manipulação de estado do Accordion
+        function toggleSection(listId, headerElement) {
+            const list = document.getElementById(listId);
+            const icon = headerElement.querySelector('.toggle-icon');
+            
+            list.classList.toggle('collapsed-list');
+            icon.classList.toggle('rotated');
         }
 
         // ==========================================
