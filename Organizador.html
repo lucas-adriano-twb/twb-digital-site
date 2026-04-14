@@ -187,6 +187,9 @@
             cursor: pointer;
             font-weight: 600;
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         button.action-btn:hover {
@@ -232,16 +235,16 @@
             flex: 1;
         }
 
-        /* Seção de Filtros */
+        /* Seção de Filtros com Chips Multi-seleção */
         .filter-section {
             background: var(--color-white);
-            padding: 15px;
+            padding: 20px;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
             margin-bottom: 30px;
             display: flex;
+            flex-direction: column;
             gap: 15px;
-            align-items: center;
         }
 
         .filter-section label {
@@ -253,12 +256,106 @@
         }
 
         .filter-section select {
-            flex: 1;
             padding: 10px;
             border-radius: 8px;
             font-size: 13px;
             background-color: var(--color-bg);
             border: 1px solid var(--color-gray);
+            width: 200px;
+            max-width: 100%;
+        }
+
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            background-color: var(--color-gray);
+            color: var(--color-charcoal);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .filter-chip:hover {
+            background-color: #d1d9e6;
+        }
+
+        .filter-chip.active {
+            background-color: var(--color-periwinkle);
+            color: var(--color-white);
+            border-color: var(--color-dark-blue);
+        }
+
+        /* Visão Semanal (Calendário) */
+        .weekly-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .day-column {
+            background: var(--color-white);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .day-column.today {
+            border: 2px solid var(--color-blue);
+            background-color: #f0f7ff;
+        }
+
+        .day-header {
+            text-align: center;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--color-dark-blue);
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--color-gray);
+            margin-bottom: 5px;
+        }
+
+        .day-header span {
+            display: block;
+            font-size: 10px;
+            color: var(--color-dusty);
+            font-weight: 500;
+        }
+
+        .weekly-task {
+            font-size: 11px;
+            background: var(--color-bg);
+            padding: 8px;
+            border-radius: 6px;
+            border-left: 3px solid var(--color-blue);
+            line-height: 1.3;
+            color: var(--color-charcoal);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .weekly-task.completed {
+            border-left-color: var(--color-dusty);
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .weekly-task strong {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--color-dark-blue);
         }
 
         /* Listas e Accordion */
@@ -490,7 +587,7 @@
             font-weight: 600;
         }
 
-        /* Modal Customizado */
+        /* Modais Customizados */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -521,14 +618,15 @@
 
         .modal-content p {
             color: var(--color-charcoal);
-            margin-bottom: 25px;
-            font-size: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
         }
 
         .modal-actions {
             display: flex;
             justify-content: center;
             gap: 15px;
+            margin-top: 20px;
         }
 
         .modal-actions button {
@@ -536,17 +634,33 @@
             padding: 12px;
         }
 
-        .btn-danger {
-            background-color: #d9534f;
+        .btn-danger { background-color: #d9534f; }
+        .btn-danger:hover { background-color: #c9302c; }
+        .btn-archive { background-color: var(--color-blue); }
+        .btn-archive:hover { background-color: #2b6ac4; }
+
+        /* Lista Inativas Modal */
+        .inactive-cats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 15px;
         }
-        .btn-danger:hover {
-            background-color: #c9302c;
+        
+        .inactive-cat-chip {
+            padding: 6px 12px;
+            border-radius: 15px;
+            background: var(--color-pink);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
         }
-        .btn-archive {
-            background-color: var(--color-blue);
-        }
-        .btn-archive:hover {
-            background-color: #2b6ac4;
+        
+        .inactive-cat-chip:hover {
+            opacity: 0.8;
         }
 
         /* Loading Overlay */
@@ -568,16 +682,9 @@
         }
 
         /* Responsividade para Celulares */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
-            }
-            .filter-section {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .filter-section select {
-                width: 100%;
             }
             .task-actions {
                 width: 100%; 
@@ -586,6 +693,33 @@
                 margin-top: 5px;
                 border-top: 1px dashed var(--color-gray); 
             }
+            
+            /* Visão Semanal no Celular vira um Carrossel Horizontal */
+            .weekly-grid {
+                display: flex;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                padding-bottom: 15px;
+                gap: 15px;
+            }
+            
+            .day-column {
+                min-width: 220px;
+                scroll-snap-align: start;
+            }
+
+            /* Estiliza scrollbar para mobile */
+            .weekly-grid::-webkit-scrollbar {
+                height: 6px;
+            }
+            .weekly-grid::-webkit-scrollbar-track {
+                background: var(--color-gray); 
+                border-radius: 10px;
+            }
+            .weekly-grid::-webkit-scrollbar-thumb {
+                background: var(--color-lilac); 
+                border-radius: 10px;
+            }
         }
     </style>
 </head>
@@ -593,7 +727,7 @@
 
     <div id="loader">Carregando dados...</div>
 
-    <!-- Modal Customizado -->
+    <!-- Modal Customizado Base -->
     <div id="customModal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 id="modalTitle">Confirmação</h3>
@@ -601,6 +735,28 @@
             <div class="modal-actions">
                 <button class="action-btn" onclick="closeModal()">Cancelar</button>
                 <button class="btn-submit" id="modalConfirmBtn" style="margin-top: 0;">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Reativar Categoria -->
+    <div id="reactivateModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Reativar Categoria</h3>
+            <p>Clique em uma categoria usada recentemente para reativá-la:</p>
+            
+            <div id="inactiveCatsList" class="inactive-cats">
+                <!-- Preenchido via JS -->
+            </div>
+            
+            <p style="margin-top:15px; font-size:12px; color:var(--color-dusty)">Ou digite o nome exato da categoria para restaurar manualmente:</p>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="manualReactivateInput" placeholder="Nome exato da categoria">
+                <button class="btn-submit" style="margin-top:0; padding:10px;" onclick="reactivateManual()">Reativar</button>
+            </div>
+
+            <div class="modal-actions">
+                <button class="action-btn" onclick="closeReactivateModal()">Fechar</button>
             </div>
         </div>
     </div>
@@ -636,6 +792,7 @@
                             </select>
                             <button type="button" class="action-btn" onclick="toggleNewCategory()" title="Nova Categoria">+</button>
                             <button type="button" class="action-btn" onclick="removeCurrentCategory()" title="Desativar Categoria Selecionada">-</button>
+                            <button type="button" class="action-btn" onclick="openReactivateModal()" title="Reativar Categorias">↺</button>
                         </div>
                         
                         <div class="new-category-box" id="newCategoryBox">
@@ -673,32 +830,48 @@
             </form>
         </div>
 
-        <!-- Seção de Filtros Globais -->
+        <!-- Seção de Filtros Globais (Nova estrutura Multi-select) -->
         <div class="filter-section">
-            <label>Filtrar por:</label>
-            <select id="filterCategory" onchange="renderTarefas()">
-                <option value="all">Todas as Categorias</option>
-                <!-- Preenchido via JS -->
-            </select>
-            <select id="filterDate" onchange="renderTarefas()">
-                <option value="all">Todos os Prazos</option>
-                <option value="atrasadas">Atrasadas</option>
-                <option value="hoje">Hoje</option>
-                <option value="amanha">Amanhã</option>
-                <option value="futuro">Futuro</option>
-                <option value="semData">Sem Data</option>
-            </select>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <label>Prazo:</label>
+                <select id="filterDate" onchange="renderTarefas()">
+                    <option value="all">Todos os Prazos</option>
+                    <option value="atrasadas">Atrasadas</option>
+                    <option value="hoje">Hoje</option>
+                    <option value="amanha">Amanhã</option>
+                    <option value="futuro">Futuro</option>
+                    <option value="semData">Sem Data</option>
+                </select>
+            </div>
+            
+            <div>
+                <label style="margin-bottom: 8px; display: block;">Filtrar Múltiplas Categorias:</label>
+                <div id="categoryFilters" class="filter-chips">
+                    <!-- Chips injetados via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Visão Semanal (Calendário) -->
+        <div class="section-header" onclick="toggleSection('weeklyView', this)">
+            <div class="title-area">
+                Visão Semanal
+                <span class="badge-count" style="font-weight:normal;">Nesta Semana</span>
+            </div>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="weekly-grid" id="weeklyView">
+            <!-- Grid injetado via JS -->
         </div>
 
         <!-- Tarefas Pendentes -->
         <div class="section-header" onclick="toggleSection('listaPendentes', this)">
             <div class="title-area">
-                Pendentes
+                Pendentes (Lista)
                 <span class="badge-count" id="countPendentes">0</span>
             </div>
             <span class="toggle-icon">▼</span>
         </div>
-        <!-- Note que removemos a estrutura flat de listPendentes para injetar os subgrupos dinamicamente -->
         <div class="task-list" id="listaPendentes">
             <!-- Cards injetados via JS -->
         </div>
@@ -726,11 +899,12 @@
         // Estado local
         let state = {
             tarefas: [],
-            categorias: []
+            categorias: [],
+            selectedCategoryFilters: [] // Armazena array de categorias selecionadas no filtro
         };
 
         // ==========================================
-        // SISTEMA DE MODAL
+        // SISTEMA DE MODAL BASE
         // ==========================================
         let modalCallback = null;
 
@@ -802,10 +976,10 @@
         }
 
         // ==========================================
-        // RENDERIZAÇÃO DA UI E LÓGICA DE DATAS
+        // UTILIDADES DE DATA
         // ==========================================
 
-        // Converte Date object para formato YYYY-MM-DD considerando o fuso horário local (Navegador)
+        // Converte Date object para formato YYYY-MM-DD
         function getLocalYYYYMMDD(dateObj) {
             const year = dateObj.getFullYear();
             const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -813,36 +987,61 @@
             return `${year}-${month}-${day}`;
         }
 
+        // Descobre a segunda-feira da semana atual
+        function getStartOfWeek(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // ajusta quando o dia é domingo
+            return new Date(d.setDate(diff));
+        }
+
+        // ==========================================
+        // RENDERIZAÇÃO DA UI E LÓGICA
+        // ==========================================
+
         function renderCategorias() {
             const selectForm = document.getElementById('categoria');
-            const selectFilter = document.getElementById('filterCategory');
+            const chipsContainer = document.getElementById('categoryFilters');
             
             const currentFormValue = selectForm.value;
-            const currentFilterValue = selectFilter.value;
             
             selectForm.innerHTML = '<option value="" disabled selected>Selecione...</option>';
-            selectFilter.innerHTML = '<option value="all">Todas as Categorias</option>';
+            chipsContainer.innerHTML = ''; // Limpa os chips
+
+            // Filtra o array de state para garantir que só existam chips de categorias validas
+            state.selectedCategoryFilters = state.selectedCategoryFilters.filter(c => state.categorias.includes(c));
 
             state.categorias.forEach(cat => {
-                // Popula Formulário
+                // Popula Dropdown do Formulário
                 const optionF = document.createElement('option');
                 optionF.value = cat;
                 optionF.textContent = cat;
                 selectForm.appendChild(optionF);
 
-                // Popula Filtro
-                const optionFi = document.createElement('option');
-                optionFi.value = cat;
-                optionFi.textContent = cat;
-                selectFilter.appendChild(optionFi);
+                // Constrói os Chips de Filtro Múltiplo
+                const chip = document.createElement('div');
+                chip.className = `filter-chip ${state.selectedCategoryFilters.includes(cat) ? 'active' : ''}`;
+                chip.textContent = cat;
+                chip.onclick = () => {
+                    toggleCategoryFilter(cat);
+                };
+                chipsContainer.appendChild(chip);
             });
 
             if (currentFormValue && state.categorias.includes(currentFormValue)) {
                 selectForm.value = currentFormValue;
             }
-            if (currentFilterValue && (state.categorias.includes(currentFilterValue) || currentFilterValue === 'all')) {
-                selectFilter.value = currentFilterValue;
+        }
+
+        function toggleCategoryFilter(cat) {
+            const index = state.selectedCategoryFilters.indexOf(cat);
+            if (index > -1) {
+                state.selectedCategoryFilters.splice(index, 1); // Remove
+            } else {
+                state.selectedCategoryFilters.push(cat); // Adiciona
             }
+            renderCategorias(); // Atualiza visual dos chips
+            renderTarefas(); // Aplica o filtro nas tarefas
         }
 
         function renderTarefas() {
@@ -852,8 +1051,7 @@
             listPendentes.innerHTML = '';
             listConcluidas.innerHTML = '';
 
-            // Capta valores dos filtros
-            const catFilter = document.getElementById('filterCategory').value;
+            // Capta valores do filtro de data
             const dateFilter = document.getElementById('filterDate').value;
             
             // Datas Locais Referenciais
@@ -867,7 +1065,6 @@
             let pendentesCount = 0;
             let concluidasCount = 0;
 
-            // Estrutura para segregar as tarefas Pendentes
             const gruposPendentes = {
                 atrasadas: { label: "🔴 Atrasadas", items: [] },
                 hoje: { label: "🟢 Hoje", items: [] },
@@ -877,7 +1074,7 @@
             };
 
             state.tarefas.forEach(t => {
-                // Lógica de Classificação Temporal baseada em String Lexicográfica (YYYY-MM-DD)
+                // Classificação Temporal
                 let bucketTemporal = 'semData';
                 if (t.data) {
                     if (t.data < todayStr) bucketTemporal = 'atrasadas';
@@ -886,14 +1083,14 @@
                     else bucketTemporal = 'futuro';
                 }
 
-                // Aplicação dos Filtros Ativos
-                if (catFilter !== 'all' && t.categoria !== catFilter) return; 
+                // Aplicação dos Filtros Múltiplos (Lógica AND)
+                if (state.selectedCategoryFilters.length > 0 && !state.selectedCategoryFilters.includes(t.categoria)) return; 
+                // Aplicação do Filtro de Data
                 if (dateFilter !== 'all' && bucketTemporal !== dateFilter) return; 
 
                 const card = document.createElement('div');
                 card.className = `task-card ${t.concluida ? 'completed' : ''}`;
                 
-                // Colorir Atrasadas (Somente se não estiverem concluídas)
                 if (bucketTemporal === 'atrasadas' && !t.concluida) {
                     card.classList.add('overdue');
                 }
@@ -966,7 +1163,6 @@
                     tituloGrupo.className = 'sub-group-header';
                     tituloGrupo.textContent = grupo.label;
                     listPendentes.appendChild(tituloGrupo);
-                    
                     grupo.items.forEach(card => listPendentes.appendChild(card));
                 }
             });
@@ -976,9 +1172,128 @@
 
             document.getElementById('countPendentes').textContent = pendentesCount;
             document.getElementById('countConcluidas').textContent = concluidasCount;
+
+            // Renderiza Visão Semanal separadamente
+            renderWeeklyView(todayObj, todayStr);
         }
 
-        // Função para manipulação de estado do Accordion
+        // ==========================================
+        // VISÃO SEMANAL (NOVA)
+        // ==========================================
+
+        function renderWeeklyView(todayObj, todayStr) {
+            const weeklyContainer = document.getElementById('weeklyView');
+            weeklyContainer.innerHTML = '';
+
+            const startOfWeek = getStartOfWeek(todayObj); // Segunda-feira
+            const daysOfWeekNames = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+
+            // Itera de 0 (Seg) a 6 (Dom)
+            for (let i = 0; i < 7; i++) {
+                const currentDayObj = new Date(startOfWeek);
+                currentDayObj.setDate(startOfWeek.getDate() + i);
+                
+                const currentDayStr = getLocalYYYYMMDD(currentDayObj);
+                const isToday = currentDayStr === todayStr;
+
+                // Busca tarefas que pertencem a este dia específico
+                const tasksForDay = state.tarefas.filter(t => t.data === currentDayStr);
+
+                // Constrói a coluna
+                const col = document.createElement('div');
+                col.className = `day-column ${isToday ? 'today' : ''}`;
+                
+                // Formatação do Header do Dia
+                const formatedDateStr = `${String(currentDayObj.getDate()).padStart(2, '0')}/${String(currentDayObj.getMonth() + 1).padStart(2, '0')}`;
+                
+                col.innerHTML = `
+                    <div class="day-header">
+                        ${daysOfWeekNames[i]}
+                        <span>${formatedDateStr}</span>
+                    </div>
+                `;
+
+                if (tasksForDay.length === 0) {
+                    col.innerHTML += `<div style="font-size:10px; color:var(--color-lilac); text-align:center; margin-top:10px;">Livre</div>`;
+                } else {
+                    tasksForDay.forEach(t => {
+                        const taskBlock = document.createElement('div');
+                        taskBlock.className = `weekly-task ${t.concluida ? 'completed' : ''}`;
+                        
+                        // Extrai hora higienizada para visualização
+                        let horaLimpa = '';
+                        if (t.horario && typeof t.horario === 'string' && t.horario.includes('T')) {
+                            const match = t.horario.match(/T(\d{2}:\d{2})/);
+                            if (match) horaLimpa = ` - ${match[1]}`;
+                        } else if (t.horario) {
+                            horaLimpa = ` - ${t.horario}`;
+                        }
+
+                        taskBlock.innerHTML = `<strong>${t.tarefa}</strong><span style="color:var(--color-dusty); font-size:9px">${t.categoria}${horaLimpa}</span>`;
+                        col.appendChild(taskBlock);
+                    });
+                }
+
+                weeklyContainer.appendChild(col);
+            }
+        }
+
+        // ==========================================
+        // GESTÃO AVANÇADA DE CATEGORIAS (REATIVAR)
+        // ==========================================
+
+        function openReactivateModal() {
+            const modal = document.getElementById('reactivateModal');
+            const listContainer = document.getElementById('inactiveCatsList');
+            document.getElementById('manualReactivateInput').value = '';
+            listContainer.innerHTML = '';
+
+            // Detecta categorias inativas procurando nas tarefas atuais (que não estão no array de ativas)
+            const todasCategoriasEmUso = [...new Set(state.tarefas.map(t => t.categoria))];
+            const categoriasInativasDetectadas = todasCategoriasEmUso.filter(c => c && !state.categorias.includes(c));
+
+            if (categoriasInativasDetectadas.length === 0) {
+                listContainer.innerHTML = '<span style="font-size:12px; color:var(--color-lilac)">Nenhuma inativa detectada nas tarefas visíveis.</span>';
+            } else {
+                categoriasInativasDetectadas.forEach(cat => {
+                    const chip = document.createElement('div');
+                    chip.className = 'inactive-cat-chip';
+                    chip.textContent = cat + " ↺";
+                    chip.onclick = () => executeReactivate(cat);
+                    listContainer.appendChild(chip);
+                });
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeReactivateModal() {
+            document.getElementById('reactivateModal').classList.add('hidden');
+        }
+
+        function reactivateManual() {
+            const nome = document.getElementById('manualReactivateInput').value.trim();
+            if (nome) executeReactivate(nome);
+        }
+
+        async function executeReactivate(nome) {
+            closeReactivateModal();
+            // O Apps Script identifica que ela existe e vai mudar a coluna pra TRUE.
+            // Se ela não existir de verdade, ele criará uma nova, o que atende perfeitamente.
+            await fetchAPI({ action: 'addCategoria', nome: nome });
+            
+            if (!state.categorias.includes(nome)) {
+                state.categorias.push(nome);
+            }
+            
+            renderCategorias();
+            showModal("Sucesso", `A categoria "${nome}" foi restaurada e está pronta para uso!`, "Legal", "", () => {});
+        }
+
+        // ==========================================
+        // LÓGICA DE TAREFAS (AÇÕES)
+        // ==========================================
+
         function toggleSection(listId, headerElement) {
             const list = document.getElementById(listId);
             const icon = headerElement.querySelector('.toggle-icon');
@@ -986,10 +1301,6 @@
             list.classList.toggle('collapsed-list');
             icon.classList.toggle('rotated');
         }
-
-        // ==========================================
-        // LÓGICA DE TAREFAS
-        // ==========================================
 
         async function submitTarefa(e) {
             e.preventDefault();
@@ -1061,10 +1372,6 @@
             await fetchAPI({ action: 'toggleConcluida', id: id, status: isChecked });
         }
 
-        // ==========================================
-        // MIGRAÇÃO DE DADOS COM MODAL
-        // ==========================================
-
         function archiveTarefa(id) {
             showModal(
                 "Arquivar Tarefa", 
@@ -1101,10 +1408,6 @@
             document.getElementById('formActionTitle').textContent = "Nova Tarefa";
             document.getElementById('btnSubmit').textContent = "Salvar Tarefa";
         }
-
-        // ==========================================
-        // LÓGICA DE CATEGORIAS
-        // ==========================================
 
         function toggleNewCategory() {
             const box = document.getElementById('newCategoryBox');
