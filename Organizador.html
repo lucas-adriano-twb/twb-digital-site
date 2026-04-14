@@ -19,6 +19,11 @@
             --color-white: #FFFFFF;
             --color-text: #343B45;
             --color-gray: #E2E8F0;
+            
+            /* Cores de Alerta */
+            --color-danger-bg: #FFF0F0;
+            --color-danger-border: #E74C3C;
+            --color-danger-text: #C0392B;
         }
 
         * {
@@ -70,7 +75,7 @@
             padding: 25px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             margin-top: -60px; /* Sobrepõe o header levemente */
             position: relative;
             border-top: 4px solid var(--color-pink);
@@ -227,6 +232,35 @@
             flex: 1;
         }
 
+        /* Seção de Filtros */
+        .filter-section {
+            background: var(--color-white);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-section label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-dusty);
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .filter-section select {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            background-color: var(--color-bg);
+            border: 1px solid var(--color-gray);
+        }
+
         /* Listas e Accordion */
         .section-header {
             display: flex;
@@ -274,7 +308,22 @@
             margin-bottom: 40px;
         }
 
-        /* Cards Refatorados para Mobile */
+        /* Subgrupos de Datas */
+        .sub-group-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-dusty);
+            margin: 15px 0 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--color-gray);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Cards Refatorados */
         .task-card {
             background: var(--color-white);
             border-radius: 15px;
@@ -282,14 +331,24 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.03);
             display: flex;
             align-items: flex-start;
-            flex-wrap: wrap; /* Permite que os blocos quebrem de linha se faltar espaço */
+            flex-wrap: wrap; 
             gap: 15px;
             border-left: 5px solid var(--color-blue);
-            transition: transform 0.2s;
+            transition: transform 0.2s, background-color 0.3s;
         }
 
         .task-card:hover {
             transform: translateY(-2px);
+        }
+
+        /* Estilo Tarefa Atrasada */
+        .task-card.overdue {
+            background-color: var(--color-danger-bg);
+            border-left-color: var(--color-danger-border);
+        }
+
+        .task-card.overdue .task-title {
+            color: var(--color-danger-text);
         }
 
         .task-card.completed {
@@ -337,7 +396,7 @@
 
         .task-content {
             flex: 1;
-            min-width: 180px; /* Garante que o texto não esprema até desaparecer */
+            min-width: 180px; 
         }
 
         .task-title {
@@ -354,7 +413,7 @@
             align-items: center;
         }
 
-        /* Estilo unificado para todas as etiquetas (data, hora, tempo) */
+        /* Estilo unificado para todas as etiquetas */
         .task-meta span {
             display: inline-flex;
             align-items: center;
@@ -368,6 +427,11 @@
             font-size: 12px;
         }
 
+        /* Diferenciar cor do badge de tempo quando está atrasada para manter legibilidade */
+        .task-card.overdue .task-meta span {
+            background-color: rgba(255, 255, 255, 0.7); 
+        }
+
         .task-meta .badge {
             background-color: var(--color-periwinkle);
             color: var(--color-white);
@@ -376,22 +440,26 @@
             text-transform: uppercase;
         }
 
+        .task-card.overdue .task-meta .badge {
+            background-color: var(--color-danger-border);
+        }
+
         .task-actions {
             display: flex;
-            gap: 12px; /* Maior espaçamento entre os botões */
+            gap: 12px; 
             flex-shrink: 0;
             align-items: center;
         }
 
         .icon-btn {
-            background: var(--color-bg); /* Fundo sutil para definir a área de toque */
+            background: var(--color-bg); 
             border: none;
             cursor: pointer;
             color: var(--color-dusty);
             font-size: 16px;
             transition: 0.2s;
-            width: 38px;  /* Área de toque maior */
-            height: 38px; /* Área de toque maior */
+            width: 38px;  
+            height: 38px; 
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -422,7 +490,7 @@
             font-weight: 600;
         }
 
-        /* Modal Customizado de Confirmação */
+        /* Modal Customizado */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -504,12 +572,19 @@
             .form-grid {
                 grid-template-columns: 1fr;
             }
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-section select {
+                width: 100%;
+            }
             .task-actions {
-                width: 100%; /* Força os botões para a linha de baixo */
-                justify-content: flex-end; /* Alinha à direita */
+                width: 100%; 
+                justify-content: flex-end; 
                 padding-top: 15px;
                 margin-top: 5px;
-                border-top: 1px dashed var(--color-gray); /* Linha separadora visual */
+                border-top: 1px dashed var(--color-gray); 
             }
         }
     </style>
@@ -518,7 +593,7 @@
 
     <div id="loader">Carregando dados...</div>
 
-    <!-- Modal Customizado (Substitui o confirm() do navegador) -->
+    <!-- Modal Customizado -->
     <div id="customModal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 id="modalTitle">Confirmação</h3>
@@ -541,7 +616,6 @@
         <div class="form-card">
             <div class="form-title">
                 <span id="formActionTitle">Nova Tarefa</span>
-                <!-- Botão de limpar formulário simplificado -->
                 <button type="button" class="action-btn" onclick="clearForm()" style="padding: 5px 15px; font-size: 12px;">Limpar</button>
             </div>
             
@@ -599,6 +673,23 @@
             </form>
         </div>
 
+        <!-- Seção de Filtros Globais -->
+        <div class="filter-section">
+            <label>Filtrar por:</label>
+            <select id="filterCategory" onchange="renderTarefas()">
+                <option value="all">Todas as Categorias</option>
+                <!-- Preenchido via JS -->
+            </select>
+            <select id="filterDate" onchange="renderTarefas()">
+                <option value="all">Todos os Prazos</option>
+                <option value="atrasadas">Atrasadas</option>
+                <option value="hoje">Hoje</option>
+                <option value="amanha">Amanhã</option>
+                <option value="futuro">Futuro</option>
+                <option value="semData">Sem Data</option>
+            </select>
+        </div>
+
         <!-- Tarefas Pendentes -->
         <div class="section-header" onclick="toggleSection('listaPendentes', this)">
             <div class="title-area">
@@ -607,6 +698,7 @@
             </div>
             <span class="toggle-icon">▼</span>
         </div>
+        <!-- Note que removemos a estrutura flat de listPendentes para injetar os subgrupos dinamicamente -->
         <div class="task-list" id="listaPendentes">
             <!-- Cards injetados via JS -->
         </div>
@@ -627,7 +719,7 @@
 
     <script>
         // =========================================================
-        // URL DO GOOGLE APPS SCRIPT ATUALIZADA
+        // URL DO GOOGLE APPS SCRIPT
         // =========================================================
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBDmm4skxObab4KsC1NgKpSqnV9hCH-_-tGKyXy8J2s32OpRcElmlzd5R9RTfQxIlByw/exec'; 
 
@@ -638,7 +730,7 @@
         };
 
         // ==========================================
-        // SISTEMA DE MODAL (Substitui o Confirm bloqueado por celulares/iframes)
+        // SISTEMA DE MODAL
         // ==========================================
         let modalCallback = null;
 
@@ -664,7 +756,6 @@
             closeModal();
         });
 
-
         // ==========================================
         // COMUNICAÇÃO COM O BACKEND
         // ==========================================
@@ -681,7 +772,6 @@
                 
                 if(result.status === 'error') {
                     showModal('Erro', result.message, 'OK', '', () => {});
-                    console.error(result.message);
                 }
                 
                 showLoader(false);
@@ -712,23 +802,46 @@
         }
 
         // ==========================================
-        // RENDERIZAÇÃO DA UI
+        // RENDERIZAÇÃO DA UI E LÓGICA DE DATAS
         // ==========================================
 
+        // Converte Date object para formato YYYY-MM-DD considerando o fuso horário local (Navegador)
+        function getLocalYYYYMMDD(dateObj) {
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         function renderCategorias() {
-            const select = document.getElementById('categoria');
-            const currentValue = select.value;
+            const selectForm = document.getElementById('categoria');
+            const selectFilter = document.getElementById('filterCategory');
             
-            select.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+            const currentFormValue = selectForm.value;
+            const currentFilterValue = selectFilter.value;
+            
+            selectForm.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+            selectFilter.innerHTML = '<option value="all">Todas as Categorias</option>';
+
             state.categorias.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat;
-                option.textContent = cat;
-                select.appendChild(option);
+                // Popula Formulário
+                const optionF = document.createElement('option');
+                optionF.value = cat;
+                optionF.textContent = cat;
+                selectForm.appendChild(optionF);
+
+                // Popula Filtro
+                const optionFi = document.createElement('option');
+                optionFi.value = cat;
+                optionFi.textContent = cat;
+                selectFilter.appendChild(optionFi);
             });
 
-            if (currentValue && state.categorias.includes(currentValue)) {
-                select.value = currentValue;
+            if (currentFormValue && state.categorias.includes(currentFormValue)) {
+                selectForm.value = currentFormValue;
+            }
+            if (currentFilterValue && (state.categorias.includes(currentFilterValue) || currentFilterValue === 'all')) {
+                selectFilter.value = currentFilterValue;
             }
         }
 
@@ -738,13 +851,52 @@
             
             listPendentes.innerHTML = '';
             listConcluidas.innerHTML = '';
+
+            // Capta valores dos filtros
+            const catFilter = document.getElementById('filterCategory').value;
+            const dateFilter = document.getElementById('filterDate').value;
             
+            // Datas Locais Referenciais
+            const todayObj = new Date();
+            const todayStr = getLocalYYYYMMDD(todayObj);
+            
+            const tomorrowObj = new Date(todayObj);
+            tomorrowObj.setDate(tomorrowObj.getDate() + 1);
+            const tomorrowStr = getLocalYYYYMMDD(tomorrowObj);
+
             let pendentesCount = 0;
             let concluidasCount = 0;
 
+            // Estrutura para segregar as tarefas Pendentes
+            const gruposPendentes = {
+                atrasadas: { label: "🔴 Atrasadas", items: [] },
+                hoje: { label: "🟢 Hoje", items: [] },
+                amanha: { label: "🟡 Amanhã", items: [] },
+                futuro: { label: "🔵 Futuro", items: [] },
+                semData: { label: "⚪ Sem Data", items: [] }
+            };
+
             state.tarefas.forEach(t => {
+                // Lógica de Classificação Temporal baseada em String Lexicográfica (YYYY-MM-DD)
+                let bucketTemporal = 'semData';
+                if (t.data) {
+                    if (t.data < todayStr) bucketTemporal = 'atrasadas';
+                    else if (t.data === todayStr) bucketTemporal = 'hoje';
+                    else if (t.data === tomorrowStr) bucketTemporal = 'amanha';
+                    else bucketTemporal = 'futuro';
+                }
+
+                // Aplicação dos Filtros Ativos
+                if (catFilter !== 'all' && t.categoria !== catFilter) return; 
+                if (dateFilter !== 'all' && bucketTemporal !== dateFilter) return; 
+
                 const card = document.createElement('div');
                 card.className = `task-card ${t.concluida ? 'completed' : ''}`;
+                
+                // Colorir Atrasadas (Somente se não estiverem concluídas)
+                if (bucketTemporal === 'atrasadas' && !t.concluida) {
+                    card.classList.add('overdue');
+                }
                 
                 let dataDisplay = '';
                 if(t.data) {
@@ -752,7 +904,6 @@
                     dataDisplay = `<span>📅 ${d}/${m}</span>`;
                 }
 
-                // Higienização da string ISO gerada pelo epoch time do Google Sheets
                 let horaDisplay = '';
                 if (t.horario) {
                     let horaLimpa = t.horario;
@@ -763,7 +914,6 @@
                     horaDisplay = `<span>⏰ ${horaLimpa}</span>`;
                 }
 
-                // Formatação do tempo em Total de Minutos para formato visual (Xh Ym)
                 let tempoDisplay = '';
                 if (t.tempo) {
                     let totalMinutos = parseInt(t.tempo);
@@ -775,7 +925,6 @@
                         if (m > 0) textTempo.push(`${m}m`);
                         tempoDisplay = `<span>⏳ ${textTempo.join(' ')}</span>`;
                     } else if (isNaN(totalMinutos) && typeof t.tempo === 'string') {
-                        // Compatibilidade com dados antigos que já estavam como texto livre
                         tempoDisplay = `<span>⏳ ${t.tempo}</span>`;
                     }
                 }
@@ -804,13 +953,26 @@
                     listConcluidas.appendChild(card);
                     concluidasCount++;
                 } else {
-                    listPendentes.appendChild(card);
+                    gruposPendentes[bucketTemporal].items.push(card);
                     pendentesCount++;
                 }
             });
 
-            if(pendentesCount === 0) listPendentes.innerHTML = '<p style="color: var(--color-lilac); font-size: 14px;">Nenhuma tarefa pendente.</p>';
-            if(concluidasCount === 0) listConcluidas.innerHTML = '<p style="color: var(--color-lilac); font-size: 14px;">Nenhuma tarefa concluída.</p>';
+            // Injeção Agrupada na DOM para Pendentes
+            ['atrasadas', 'hoje', 'amanha', 'futuro', 'semData'].forEach(key => {
+                const grupo = gruposPendentes[key];
+                if (grupo.items.length > 0) {
+                    const tituloGrupo = document.createElement('div');
+                    tituloGrupo.className = 'sub-group-header';
+                    tituloGrupo.textContent = grupo.label;
+                    listPendentes.appendChild(tituloGrupo);
+                    
+                    grupo.items.forEach(card => listPendentes.appendChild(card));
+                }
+            });
+
+            if(pendentesCount === 0) listPendentes.innerHTML = '<p style="color: var(--color-lilac); font-size: 14px; margin-top:10px;">Nenhuma tarefa encontrada.</p>';
+            if(concluidasCount === 0) listConcluidas.innerHTML = '<p style="color: var(--color-lilac); font-size: 14px; margin-top:10px;">Nenhuma tarefa encontrada.</p>';
 
             document.getElementById('countPendentes').textContent = pendentesCount;
             document.getElementById('countConcluidas').textContent = concluidasCount;
@@ -833,8 +995,6 @@
             e.preventDefault();
             
             const id = document.getElementById('tarefaId').value;
-            
-            // Tratamento do Tempo Estimado (Soma as horas e minutos num total inteiro)
             const inputHoras = parseInt(document.getElementById('tempoHoras').value) || 0;
             const inputMinutos = parseInt(document.getElementById('tempoMinutos').value) || 0;
             const totalMinutos = (inputHoras * 60) + inputMinutos;
@@ -844,7 +1004,7 @@
                 categoria: document.getElementById('categoria').value,
                 data: document.getElementById('data').value,
                 horario: document.getElementById('horario').value,
-                tempo: totalMinutos > 0 ? totalMinutos : "" // Salva em minutos para o dashboard
+                tempo: totalMinutos > 0 ? totalMinutos : ""
             };
 
             if (id) {
@@ -871,7 +1031,6 @@
             document.getElementById('data').value = t.data;
             document.getElementById('horario').value = t.horario;
             
-            // Preenche os campos de Hora e Minuto baseado no total salvo
             if (t.tempo && !isNaN(parseInt(t.tempo))) {
                 document.getElementById('tempoHoras').value = Math.floor(t.tempo / 60) || '';
                 document.getElementById('tempoMinutos').value = t.tempo % 60 || '';
@@ -903,7 +1062,7 @@
         }
 
         // ==========================================
-        // MIGRAÇÃO DE DADOS (ARQUIVO E LIXEIRA) COM MODAL
+        // MIGRAÇÃO DE DADOS COM MODAL
         // ==========================================
 
         function archiveTarefa(id) {
@@ -913,10 +1072,8 @@
                 "Arquivar", 
                 "btn-archive",
                 async () => {
-                    // UI Update Otimista
                     state.tarefas = state.tarefas.filter(t => t.id !== id);
                     renderTarefas();
-                    // Execução Backend
                     await fetchAPI({ action: 'archiveTarefa', id: id });
                 }
             );
@@ -929,10 +1086,8 @@
                 "Sim, excluir", 
                 "btn-danger",
                 async () => {
-                    // UI Update Otimista
                     state.tarefas = state.tarefas.filter(t => t.id !== id);
                     renderTarefas();
-                    // Execução Backend
                     await fetchAPI({ action: 'deleteTarefa', id: id });
                 }
             );
