@@ -126,6 +126,44 @@
             box-shadow: 0 0 0 3px rgba(152, 152, 245, 0.2);
         }
 
+        .time-inputs-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .time-inputs-wrapper .time-field {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background-color: var(--color-bg);
+            border: 1px solid var(--color-gray);
+            border-radius: 10px;
+            padding-right: 15px;
+            transition: all 0.3s;
+        }
+
+        .time-inputs-wrapper .time-field:focus-within {
+            border-color: var(--color-periwinkle);
+            box-shadow: 0 0 0 3px rgba(152, 152, 245, 0.2);
+        }
+
+        .time-inputs-wrapper input {
+            border: none;
+            box-shadow: none;
+            background: transparent;
+            width: 100%;
+        }
+
+        .time-inputs-wrapper input:focus {
+            box-shadow: none;
+        }
+
+        .time-inputs-wrapper span {
+            font-size: 12px;
+            color: var(--color-dusty);
+            font-weight: 700;
+        }
+
         .category-wrapper {
             display: flex;
             gap: 10px;
@@ -169,7 +207,7 @@
             background-color: #c72b8d;
         }
 
-        /* Gestão de Categoria (Escondida por padrão) */
+        /* Gestão de Categoria */
         .new-category-box {
             display: none;
             background-color: var(--color-bg);
@@ -189,19 +227,7 @@
             flex: 1;
         }
 
-        /* Listas e Cards */
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--color-charcoal);
-            margin-bottom: 15px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid var(--color-gray);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* Novas classes para o Accordion (Colapsar abas) */
+        /* Listas e Accordion */
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -248,13 +274,15 @@
             margin-bottom: 40px;
         }
 
+        /* Cards Refatorados para Mobile */
         .task-card {
             background: var(--color-white);
             border-radius: 15px;
             padding: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.03);
             display: flex;
-            align-items: flex-start; /* Ajustado para impedir desalinhamento em títulos com quebra de linha */
+            align-items: flex-start;
+            flex-wrap: wrap; /* Permite que os blocos quebrem de linha se faltar espaço */
             gap: 15px;
             border-left: 5px solid var(--color-blue);
             transition: transform 0.2s;
@@ -274,9 +302,10 @@
             color: var(--color-dusty);
         }
 
-        /* Checkbox Customizado */
         .checkbox-wrapper {
             position: relative;
+            flex-shrink: 0;
+            margin-top: 2px;
         }
 
         .checkbox-wrapper input[type="checkbox"] {
@@ -306,91 +335,150 @@
             transform: translate(-50%, -50%);
         }
 
-        .checkbox-wrapper {
-            flex-shrink: 0; /* Impede que o checkbox seja esmagado em telas pequenas */
-            margin-top: 2px;
-        }
-
         .task-content {
             flex: 1;
-            min-width: 0; /* Permite que o texto quebre corretamente sem expandir e vazar do flex-container */
+            min-width: 180px; /* Garante que o texto não esprema até desaparecer */
         }
 
         .task-title {
             font-size: 16px;
             font-weight: 600;
             color: var(--color-dark-blue);
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
 
         .task-meta {
-            font-size: 13px;
-            color: var(--color-charcoal);
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
             align-items: center;
-            margin-top: 6px;
         }
 
+        /* Estilo unificado para todas as etiquetas (data, hora, tempo) */
         .task-meta span {
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            white-space: nowrap; /* Impede que o ícone se descole do valor numérico */
-        }
-
-        .badge {
+            white-space: nowrap;
             background-color: var(--color-bg);
+            padding: 5px 10px;
+            border-radius: 8px;
             color: var(--color-dusty);
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            white-space: normal; /* Permite que títulos de categorias muito longas quebrem sem forçar o card */
+            font-weight: 500;
+            font-size: 12px;
         }
 
-        .task-actions {
-            display: flex;
-            gap: 10px;
-            flex-shrink: 0; /* Impede que os botões de ação sejam esmagados */
-        }
-
-        .badge {
-            background-color: var(--color-bg);
-            color: var(--color-dusty);
-            padding: 3px 8px;
-            border-radius: 6px;
+        .task-meta .badge {
+            background-color: var(--color-periwinkle);
+            color: var(--color-white);
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
         }
 
         .task-actions {
             display: flex;
-            gap: 10px;
+            gap: 12px; /* Maior espaçamento entre os botões */
+            flex-shrink: 0;
+            align-items: center;
         }
 
         .icon-btn {
-            background: none;
+            background: var(--color-bg); /* Fundo sutil para definir a área de toque */
             border: none;
             cursor: pointer;
-            color: var(--color-lilac);
+            color: var(--color-dusty);
             font-size: 16px;
             transition: 0.2s;
+            width: 38px;  /* Área de toque maior */
+            height: 38px; /* Área de toque maior */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .icon-btn:hover {
             color: var(--color-charcoal);
+            background-color: var(--color-gray);
         }
         
         .icon-btn.archive:hover {
             color: var(--color-blue);
+            background-color: #e6f0fa;
         }
 
         .icon-btn.delete:hover {
             color: #d9534f;
+            background-color: #fcebeb;
+        }
+
+        .badge-count {
+            background-color: var(--color-bg);
+            color: var(--color-dusty);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Modal Customizado de Confirmação */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            background: var(--color-white);
+            padding: 25px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            color: var(--color-dark-blue);
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .modal-content p {
+            color: var(--color-charcoal);
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+        }
+
+        .btn-danger {
+            background-color: #d9534f;
+        }
+        .btn-danger:hover {
+            background-color: #c9302c;
+        }
+        .btn-archive {
+            background-color: var(--color-blue);
+        }
+        .btn-archive:hover {
+            background-color: #2b6ac4;
         }
 
         /* Loading Overlay */
@@ -401,7 +489,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 3000;
             font-weight: 600;
             color: var(--color-dark-blue);
             backdrop-filter: blur(2px);
@@ -411,13 +499,17 @@
             display: none !important;
         }
 
+        /* Responsividade para Celulares */
         @media (max-width: 600px) {
             .form-grid {
                 grid-template-columns: 1fr;
             }
-            .task-meta {
-                flex-direction: column;
-                gap: 5px;
+            .task-actions {
+                width: 100%; /* Força os botões para a linha de baixo */
+                justify-content: flex-end; /* Alinha à direita */
+                padding-top: 15px;
+                margin-top: 5px;
+                border-top: 1px dashed var(--color-gray); /* Linha separadora visual */
             }
         }
     </style>
@@ -425,6 +517,18 @@
 <body>
 
     <div id="loader">Carregando dados...</div>
+
+    <!-- Modal Customizado (Substitui o confirm() do navegador) -->
+    <div id="customModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="modalTitle">Confirmação</h3>
+            <p id="modalMessage">Você tem certeza?</p>
+            <div class="modal-actions">
+                <button class="action-btn" onclick="closeModal()">Cancelar</button>
+                <button class="btn-submit" id="modalConfirmBtn" style="margin-top: 0;">Confirmar</button>
+            </div>
+        </div>
+    </div>
 
     <header>
         <h1>Meu Organizador</h1>
@@ -437,7 +541,8 @@
         <div class="form-card">
             <div class="form-title">
                 <span id="formActionTitle">Nova Tarefa</span>
-                <button type="button" class="icon-btn" onclick="clearForm()" title="Limpar Formulário">↺</button>
+                <!-- Botão de limpar formulário simplificado -->
+                <button type="button" class="action-btn" onclick="clearForm()" style="padding: 5px 15px; font-size: 12px;">Limpar</button>
             </div>
             
             <form id="taskForm" onsubmit="submitTarefa(event)">
@@ -476,8 +581,17 @@
                     </div>
 
                     <div class="input-group">
-                        <label for="tempo">Tempo Estimado (Opcional)</label>
-                        <input type="text" id="tempo" placeholder="Ex: 40 min, 1h">
+                        <label>Tempo Estimado (Opcional)</label>
+                        <div class="time-inputs-wrapper">
+                            <div class="time-field">
+                                <input type="number" id="tempoHoras" min="0" placeholder="0">
+                                <span>H</span>
+                            </div>
+                            <div class="time-field">
+                                <input type="number" id="tempoMinutos" min="0" max="59" placeholder="0">
+                                <span>MIN</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -489,7 +603,7 @@
         <div class="section-header" onclick="toggleSection('listaPendentes', this)">
             <div class="title-area">
                 Pendentes
-                <span class="badge" id="countPendentes">0</span>
+                <span class="badge-count" id="countPendentes">0</span>
             </div>
             <span class="toggle-icon">▼</span>
         </div>
@@ -501,7 +615,7 @@
         <div class="section-header" onclick="toggleSection('listaConcluidas', this)">
             <div class="title-area">
                 Concluídas
-                <span class="badge" id="countConcluidas">0</span>
+                <span class="badge-count" id="countConcluidas">0</span>
             </div>
             <span class="toggle-icon rotated">▼</span>
         </div>
@@ -513,7 +627,7 @@
 
     <script>
         // =========================================================
-        // ATENÇÃO: COLOQUE A URL DO SEU APPS SCRIPT AQUI
+        // URL DO GOOGLE APPS SCRIPT ATUALIZADA
         // =========================================================
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBDmm4skxObab4KsC1NgKpSqnV9hCH-_-tGKyXy8J2s32OpRcElmlzd5R9RTfQxIlByw/exec'; 
 
@@ -522,6 +636,34 @@
             tarefas: [],
             categorias: []
         };
+
+        // ==========================================
+        // SISTEMA DE MODAL (Substitui o Confirm bloqueado por celulares/iframes)
+        // ==========================================
+        let modalCallback = null;
+
+        function showModal(title, message, btnText, btnClass, callback) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            confirmBtn.textContent = btnText;
+            confirmBtn.className = 'btn-submit ' + btnClass;
+            
+            modalCallback = callback;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('customModal').classList.add('hidden');
+            modalCallback = null;
+        }
+
+        document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+            if (modalCallback) modalCallback();
+            closeModal();
+        });
+
 
         // ==========================================
         // COMUNICAÇÃO COM O BACKEND
@@ -538,7 +680,7 @@
                 const result = await response.json();
                 
                 if(result.status === 'error') {
-                    alert('Erro: ' + result.message);
+                    showModal('Erro', result.message, 'OK', '', () => {});
                     console.error(result.message);
                 }
                 
@@ -546,7 +688,7 @@
                 return result.data;
             } catch (error) {
                 showLoader(false);
-                alert('Erro de conexão. Verifique o console.');
+                showModal('Erro de Conexão', 'Não foi possível conectar. Tente novamente.', 'OK', '', () => {});
                 console.error(error);
             }
         }
@@ -556,11 +698,6 @@
         // ==========================================
 
         window.onload = async () => {
-            if(APP_SCRIPT_URL === 'SUA_URL_DO_WEB_APP_AQUI') {
-                alert("Por favor, configure a APP_SCRIPT_URL no código fonte HTML após a publicação no Apps Script.");
-                showLoader(false);
-                return;
-            }
             await loadData();
         };
 
@@ -626,7 +763,22 @@
                     horaDisplay = `<span>⏰ ${horaLimpa}</span>`;
                 }
 
-                let tempoDisplay = t.tempo ? `<span>⏳ ${t.tempo}</span>` : '';
+                // Formatação do tempo em Total de Minutos para formato visual (Xh Ym)
+                let tempoDisplay = '';
+                if (t.tempo) {
+                    let totalMinutos = parseInt(t.tempo);
+                    if (!isNaN(totalMinutos) && totalMinutos > 0) {
+                        const h = Math.floor(totalMinutos / 60);
+                        const m = totalMinutos % 60;
+                        let textTempo = [];
+                        if (h > 0) textTempo.push(`${h}h`);
+                        if (m > 0) textTempo.push(`${m}m`);
+                        tempoDisplay = `<span>⏳ ${textTempo.join(' ')}</span>`;
+                    } else if (isNaN(totalMinutos) && typeof t.tempo === 'string') {
+                        // Compatibilidade com dados antigos que já estavam como texto livre
+                        tempoDisplay = `<span>⏳ ${t.tempo}</span>`;
+                    }
+                }
 
                 card.innerHTML = `
                     <div class="checkbox-wrapper">
@@ -681,12 +833,18 @@
             e.preventDefault();
             
             const id = document.getElementById('tarefaId').value;
+            
+            // Tratamento do Tempo Estimado (Soma as horas e minutos num total inteiro)
+            const inputHoras = parseInt(document.getElementById('tempoHoras').value) || 0;
+            const inputMinutos = parseInt(document.getElementById('tempoMinutos').value) || 0;
+            const totalMinutos = (inputHoras * 60) + inputMinutos;
+
             const dataObj = {
                 tarefa: document.getElementById('tarefa').value,
                 categoria: document.getElementById('categoria').value,
                 data: document.getElementById('data').value,
                 horario: document.getElementById('horario').value,
-                tempo: document.getElementById('tempo').value
+                tempo: totalMinutos > 0 ? totalMinutos : "" // Salva em minutos para o dashboard
             };
 
             if (id) {
@@ -712,7 +870,15 @@
             document.getElementById('tarefa').value = t.tarefa;
             document.getElementById('data').value = t.data;
             document.getElementById('horario').value = t.horario;
-            document.getElementById('tempo').value = t.tempo;
+            
+            // Preenche os campos de Hora e Minuto baseado no total salvo
+            if (t.tempo && !isNaN(parseInt(t.tempo))) {
+                document.getElementById('tempoHoras').value = Math.floor(t.tempo / 60) || '';
+                document.getElementById('tempoMinutos').value = t.tempo % 60 || '';
+            } else {
+                document.getElementById('tempoHoras').value = '';
+                document.getElementById('tempoMinutos').value = '';
+            }
             
             const select = document.getElementById('categoria');
             if (!state.categorias.includes(t.categoria)) {
@@ -737,34 +903,46 @@
         }
 
         // ==========================================
-        // MIGRAÇÃO DE DADOS (ARQUIVO E LIXEIRA)
+        // MIGRAÇÃO DE DADOS (ARQUIVO E LIXEIRA) COM MODAL
         // ==========================================
 
-        async function archiveTarefa(id) {
-            if (!confirm("Arquivar esta tarefa? Ela sairá da tela principal e irá para a aba de Arquivadas no banco de dados.")) return;
-            
-            // UI Update Otimista
-            state.tarefas = state.tarefas.filter(t => t.id !== id);
-            renderTarefas();
-
-            // Execução Backend
-            await fetchAPI({ action: 'archiveTarefa', id: id });
+        function archiveTarefa(id) {
+            showModal(
+                "Arquivar Tarefa", 
+                "A tarefa sairá da lista e irá para a aba Arquivadas. Continuar?", 
+                "Arquivar", 
+                "btn-archive",
+                async () => {
+                    // UI Update Otimista
+                    state.tarefas = state.tarefas.filter(t => t.id !== id);
+                    renderTarefas();
+                    // Execução Backend
+                    await fetchAPI({ action: 'archiveTarefa', id: id });
+                }
+            );
         }
 
-        async function deleteTarefa(id) {
-            if (!confirm("Enviar esta tarefa para a Lixeira?")) return;
-            
-            // UI Update Otimista
-            state.tarefas = state.tarefas.filter(t => t.id !== id);
-            renderTarefas();
-
-            // Execução Backend (O backend move para a aba Lixeira)
-            await fetchAPI({ action: 'deleteTarefa', id: id });
+        function deleteTarefa(id) {
+            showModal(
+                "Excluir Tarefa", 
+                "Enviar esta tarefa para a Lixeira? Ela será deletada após 30 dias.", 
+                "Sim, excluir", 
+                "btn-danger",
+                async () => {
+                    // UI Update Otimista
+                    state.tarefas = state.tarefas.filter(t => t.id !== id);
+                    renderTarefas();
+                    // Execução Backend
+                    await fetchAPI({ action: 'deleteTarefa', id: id });
+                }
+            );
         }
 
         function clearForm() {
             document.getElementById('taskForm').reset();
             document.getElementById('tarefaId').value = '';
+            document.getElementById('tempoHoras').value = '';
+            document.getElementById('tempoMinutos').value = '';
             document.getElementById('formActionTitle').textContent = "Nova Tarefa";
             document.getElementById('btnSubmit').textContent = "Salvar Tarefa";
         }
@@ -797,21 +975,26 @@
             toggleNewCategory();
         }
 
-        async function removeCurrentCategory() {
+        function removeCurrentCategory() {
             const select = document.getElementById('categoria');
             const nome = select.value;
             
             if(!nome) {
-                alert("Selecione uma categoria para desativar.");
+                showModal("Aviso", "Selecione uma categoria para desativar.", "Entendi", "", () => {});
                 return;
             }
 
-            if (!confirm(`Desativar a categoria "${nome}"? Ela não aparecerá mais na lista, mas tarefas antigas não serão afetadas.`)) return;
-
-            await fetchAPI({ action: 'desativarCategoria', nome: nome });
-            
-            state.categorias = state.categorias.filter(c => c !== nome);
-            renderCategorias();
+            showModal(
+                "Desativar Categoria", 
+                `Desativar a categoria "${nome}"? Tarefas antigas não serão afetadas.`, 
+                "Sim, desativar", 
+                "btn-danger",
+                async () => {
+                    await fetchAPI({ action: 'desativarCategoria', nome: nome });
+                    state.categorias = state.categorias.filter(c => c !== nome);
+                    renderCategorias();
+                }
+            );
         }
 
         function showLoader(show) {
