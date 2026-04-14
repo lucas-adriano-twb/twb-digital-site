@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Organizador</title>
+    <style>
+        /* Paleta de Cores Extraída da Imagem */
+        :root {
+            --color-blue: #3A80E0;
+            --color-dark-blue: #40399E;
+            --color-pink: #E03AA4;
+            --color-dusty: #AB6590;
+            --color-charcoal: #343B45;
+            --color-lilac: #B2A1CF;
+            --color-periwinkle: #9898F5;
+            --color-purple: #8E2BD9;
+            --color-bg: #F8F9FB;
+            --color-white: #FFFFFF;
+            --color-text: #343B45;
+            --color-gray: #E2E8F0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--color-dark-blue), var(--color-purple));
+            color: var(--color-white);
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: var(--color-lilac);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Formulário */
+        .form-card {
+            background: var(--color-white);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+            margin-top: -60px; /* Sobrepõe o header levemente */
+            position: relative;
+            border-top: 4px solid var(--color-pink);
+        }
+
+        .form-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-dark-blue);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-dusty);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            padding: 12px 15px;
+            border: 1px solid var(--color-gray);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--color-text);
+            background-color: var(--color-bg);
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--color-periwinkle);
+            box-shadow: 0 0 0 3px rgba(152, 152, 245, 0.2);
+        }
+
+        .category-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .category-wrapper select {
+            flex: 1;
+        }
+
+        button.action-btn {
+            background-color: var(--color-white);
+            color: var(--color-charcoal);
+            border: 1px solid var(--color-gray);
+            border-radius: 10px;
+            padding: 0 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        button.action-btn:hover {
+            background-color: var(--color-gray);
+        }
+
+        .btn-submit {
+            background-color: var(--color-pink);
+            color: var(--color-white);
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: background 0.3s;
+            box-shadow: 0 4px 10px rgba(224, 58, 164, 0.3);
+        }
+
+        .btn-submit:hover {
+            background-color: #c72b8d;
+        }
+
+        /* Gestão de Categoria (Escondida por padrão) */
+        .new-category-box {
+            display: none;
+            background-color: var(--color-bg);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 1px dashed var(--color-lilac);
+        }
+
+        .new-category-box.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .new-category-box input {
+            flex: 1;
+        }
+
+        /* Listas e Cards */
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-charcoal);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--color-gray);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .task-card {
+            background: var(--color-white);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-left: 5px solid var(--color-blue);
+            transition: transform 0.2s;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .task-card.completed {
+            border-left-color: var(--color-dusty);
+            opacity: 0.7;
+        }
+
+        .task-card.completed .task-title {
+            text-decoration: line-through;
+            color: var(--color-dusty);
+        }
+
+        /* Checkbox Customizado */
+        .checkbox-wrapper {
+            position: relative;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--color-periwinkle);
+            border-radius: 6px;
+            background-color: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: 0.2s;
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:checked {
+            background-color: var(--color-periwinkle);
+            border-color: var(--color-periwinkle);
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 16px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-dark-blue);
+            margin-bottom: 4px;
+        }
+
+        .task-meta {
+            font-size: 13px;
+            color: var(--color-charcoal);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background-color: var(--color-bg);
+            color: var(--color-dusty);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-lilac);
+            font-size: 16px;
+            transition: 0.2s;
+        }
+
+        .icon-btn:hover {
+            color: var(--color-charcoal);
+        }
+        
+        .icon-btn.delete:hover {
+            color: #d9534f;
+        }
+
+        /* Loading Overlay */
+        #loader {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            font-weight: 600;
+            color: var(--color-dark-blue);
+            backdrop-filter: blur(2px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .task-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">Carregando dados...</div>
+
+    <header>
+        <h1>Meu Organizador</h1>
+        <p>Planeje seu dia com leveza e praticidade</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- Formulário de Tarefa -->
+        <div class="form-card">
+            <div class="form-title">
+                <span id="formActionTitle">Nova Tarefa</span>
+                <button type="button" class="icon-btn" onclick="clearForm()" title="Limpar Formulário">↺</button>
+            </div>
+            
+            <form id="taskForm" onsubmit="submitTarefa(event)">
+                <input type="hidden" id="tarefaId">
+                
+                <div class="form-grid">
+                    <div class="input-group full-width">
+                        <label for="tarefa">O que precisa ser feito?</label>
+                        <input type="text" id="tarefa" required placeholder="Ex: Estudar para a prova">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="categoria">Categoria</label>
+                        <div class="category-wrapper">
+                            <select id="categoria" required>
+                                <option value="" disabled selected>Selecione...</option>
+                            </select>
+                            <button type="button" class="action-btn" onclick="toggleNewCategory()" title="Nova Categoria">+</button>
+                            <button type="button" class="action-btn" onclick="removeCurrentCategory()" title="Desativar Categoria Selecionada">-</button>
+                        </div>
+                        
+                        <div class="new-category-box" id="newCategoryBox">
+                            <input type="text" id="novaCategoriaInput" placeholder="Nome da nova categoria">
+                            <button type="button" class="action-btn" onclick="saveNewCategory()">Salvar</button>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="data">Data (Opcional)</label>
+                        <input type="date" id="data">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="horario">Horário (Opcional)</label>
+                        <input type="time" id="horario">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="tempo">Tempo Estimado (Opcional)</label>
+                        <input type="text" id="tempo" placeholder="Ex: 40 min, 1h">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="btnSubmit">Salvar Tarefa</button>
+            </form>
+        </div>
+
+        <!-- Tarefas Pendentes -->
+        <div class="section-title">
+            Pendentes
+            <span class="badge" id="countPendentes">0</span>
+        </div>
+        <div class="task-list" id="listaPendentes">
+            <!-- Cards injetados via JS -->
+        </div>
+
+        <!-- Tarefas Concluídas -->
+        <div class="section-title">
+            Concluídas
+            <span class="badge" id="countConcluidas">0</span>
+        </div>
+        <div class="task-list" id="listaConcluidas">
+            <!-- Cards injetados via JS -->
+        </div>
+
+    </div>
+
+    <script>
+        // =========================================================
+        // ATENÇÃO: COLOQUE A URL DO SEU APPS SCRIPT AQUI
+        // =========================================================
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBDmm4skxObab4KsC1NgKpSqnV9hCH-_-tGKyXy8J2s32OpRcElmlzd5R9RTfQxIlByw/exec'; 
+
+        // Estado local
+        let state = {
+            tarefas: [],
+            categorias: []
+        };
+
+        // ==========================================
+        // COMUNICAÇÃO COM O BACKEND
+        // ==========================================
+
+        async function fetchAPI(payload) {
+            showLoader(true);
+            try {
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    // Enviar como text/plain evita requisição preflight OPTIONS de CORS
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if(result.status === 'error') {
+                    alert('Erro: ' + result.message);
+                    console.error(result.message);
+                }
+                
+                showLoader(false);
+                return result.data;
+            } catch (error) {
+                showLoader(false);
+                alert('Erro de conexão. Verifique o console.');
+                console.error(error);
+            }
+        }
+
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
+
+        window.onload = async () => {
+            if(APP_SCRIPT_URL === 'SUA_URL_DO_WEB_APP_AQUI') {
+                alert("Por favor, configure a APP_SCRIPT_URL no código fonte HTML.");
+                showLoader(false);
+                return;
+            }
+            await loadData();
+        };
+
+        async function loadData() {
+            const data = await fetchAPI({ action: 'getInitData' });
+            if (data) {
+                state.tarefas = data.tarefas;
+                state.categorias = data.categorias;
+                renderCategorias();
+                renderTarefas();
+            }
+        }
+
+        // ==========================================
+        // RENDERIZAÇÃO DA UI
+        // ==========================================
+
+        function renderCategorias() {
+            const select = document.getElementById('categoria');
+            const currentValue = select.value;
+            
+            select.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+            state.categorias.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                select.appendChild(option);
+            });
+
+            // Restaura o valor se ele ainda existir na lista
+            if (currentValue && state.categorias.includes(currentValue)) {
+                select.value = currentValue;
+            }
+        }
+
+        function renderTarefas() {
+            const listPendentes = document.getElementById('listaPendentes');
+            const listConcluidas = document.getElementById('listaConcluidas');
+            
+            listPendentes.innerHTML = '';
+            listConcluidas.innerHTML = '';
+            
+            let pendentesCount = 0;
+            let concluidasCount = 0;
+
+            state.tarefas.forEach(t => {
+                const card = document.createElement('div');
+                card.className = `task-card ${t.concluida ? 'completed' : ''}`;
+                
+                // Formatação de data visual
+                let dataDisplay = '';
+                if(t.data) {
+                    const [y, m, d] = t.data.split('-');
+                    dataDisplay = `📅 ${d}/${m}`;
+                }
+
+                card.innerHTML = `
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" ${t.concluida ? 'checked' : ''} onchange="toggleStatus('${t.id}', this.checked)">
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">${t.tarefa}</div>
+                        <div class="task-meta">
+                            <span class="badge">${t.categoria}</span>
+                            ${dataDisplay ? `<span>${dataDisplay}</span>` : ''}
+                            ${t.horario ? `<span>⏰ ${t.horario}</span>` : ''}
+                            ${t.tempo ? `<span>⏳ ${t.tempo}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="icon-btn" onclick="editTarefa('${t.id}')" title="Editar">✎</button>
+                        <button class="icon-btn delete" onclick="deleteTarefa('${t.id}')" title="Excluir">🗑</button>
+                    </div>
+                `;
+
+                if (t.concluida) {
+                    listConcluidas.appendChild(card);
+                    concluidasCount++;
+                } else {
+                    listPendentes.appendChild(card);
+                    pendentesCount++;
+                }
+            });
+
+            if(pendentesCount === 0) listPendentes.innerHTML = '<p style="color: var(--color-lilac); font-size: 14px;">Nenhuma tarefa pendente.</p>';
+            if(concluidasCount === 0) listConcluidas.innerHTML = '<p style="color: var(--color-lilac); font-size: 14px;">Nenhuma tarefa concluída.</p>';
+
+            document.getElementById('countPendentes').textContent = pendentesCount;
+            document.getElementById('countConcluidas').textContent = concluidasCount;
+        }
+
+        // ==========================================
+        // LÓGICA DE TAREFAS
+        // ==========================================
+
+        async function submitTarefa(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('tarefaId').value;
+            const dataObj = {
+                tarefa: document.getElementById('tarefa').value,
+                categoria: document.getElementById('categoria').value,
+                data: document.getElementById('data').value,
+                horario: document.getElementById('horario').value,
+                tempo: document.getElementById('tempo').value
+            };
+
+            if (id) {
+                // Modo Edição
+                await fetchAPI({ action: 'updateTarefa', data: { id, ...dataObj } });
+                // Atualiza estado local
+                const index = state.tarefas.findIndex(t => t.id === id);
+                state.tarefas[index] = { ...state.tarefas[index], ...dataObj };
+            } else {
+                // Modo Criação
+                const res = await fetchAPI({ action: 'addTarefa', data: dataObj });
+                if(res) {
+                    state.tarefas.push({ id: res.id, concluida: false, ...dataObj });
+                }
+            }
+
+            clearForm();
+            renderTarefas();
+        }
+
+        function editTarefa(id) {
+            const t = state.tarefas.find(x => x.id === id);
+            if (!t) return;
+
+            document.getElementById('tarefaId').value = t.id;
+            document.getElementById('tarefa').value = t.tarefa;
+            document.getElementById('data').value = t.data;
+            document.getElementById('horario').value = t.horario;
+            document.getElementById('tempo').value = t.tempo;
+            
+            // Adiciona a categoria temporariamente ao select se ela foi desativada no banco
+            const select = document.getElementById('categoria');
+            if (!state.categorias.includes(t.categoria)) {
+                const option = document.createElement('option');
+                option.value = t.categoria;
+                option.textContent = t.categoria + ' (Inativa)';
+                select.appendChild(option);
+            }
+            select.value = t.categoria;
+
+            document.getElementById('formActionTitle').textContent = "Editar Tarefa";
+            document.getElementById('btnSubmit').textContent = "Atualizar Tarefa";
+            document.getElementById('tarefa').focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function deleteTarefa(id) {
+            if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
+            
+            await fetchAPI({ action: 'deleteTarefa', id: id });
+            state.tarefas = state.tarefas.filter(t => t.id !== id);
+            renderTarefas();
+        }
+
+        async function toggleStatus(id, isChecked) {
+            // Atualiza UI instantaneamente (Optimistic UI Update)
+            const index = state.tarefas.findIndex(t => t.id === id);
+            state.tarefas[index].concluida = isChecked;
+            renderTarefas(); 
+
+            // Confirma no backend em background
+            await fetchAPI({ action: 'toggleConcluida', id: id, status: isChecked });
+        }
+
+        function clearForm() {
+            document.getElementById('taskForm').reset();
+            document.getElementById('tarefaId').value = '';
+            document.getElementById('formActionTitle').textContent = "Nova Tarefa";
+            document.getElementById('btnSubmit').textContent = "Salvar Tarefa";
+        }
+
+        // ==========================================
+        // LÓGICA DE CATEGORIAS
+        // ==========================================
+
+        function toggleNewCategory() {
+            const box = document.getElementById('newCategoryBox');
+            box.classList.toggle('active');
+            if(box.classList.contains('active')) document.getElementById('novaCategoriaInput').focus();
+        }
+
+        async function saveNewCategory() {
+            const input = document.getElementById('novaCategoriaInput');
+            const nome = input.value.trim();
+            
+            if (!nome) return;
+
+            await fetchAPI({ action: 'addCategoria', nome: nome });
+            
+            if (!state.categorias.includes(nome)) {
+                state.categorias.push(nome);
+            }
+            
+            renderCategorias();
+            document.getElementById('categoria').value = nome;
+            input.value = '';
+            toggleNewCategory();
+        }
+
+        async function removeCurrentCategory() {
+            const select = document.getElementById('categoria');
+            const nome = select.value;
+            
+            if(!nome) {
+                alert("Selecione uma categoria para desativar.");
+                return;
+            }
+
+            if (!confirm(`Desativar a categoria "${nome}"? Ela não aparecerá mais na lista, mas tarefas antigas não serão afetadas.`)) return;
+
+            await fetchAPI({ action: 'desativarCategoria', nome: nome });
+            
+            state.categorias = state.categorias.filter(c => c !== nome);
+            renderCategorias();
+        }
+
+        // Utilidade
+        function showLoader(show) {
+            document.getElementById('loader').classList.toggle('hidden', !show);
+        }
+
+    </script>
+</body>
+</html>
