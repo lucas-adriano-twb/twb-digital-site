@@ -1038,7 +1038,10 @@
             .container { padding: 0 15px; }
             .narrow-content { padding: 0; }
             .form-card { padding: 20px; }
-            .form-grid { grid-template-columns: 1fr; }
+            
+            /* Ajuste da grid do formulário para manter data e hora lado a lado no celular */
+            .form-grid { grid-template-columns: 1fr 1fr; }
+            .full-on-mobile { grid-column: 1 / -1; }
             
             .category-wrapper { flex-wrap: wrap; }
             .category-wrapper select { min-width: 100%; margin-bottom: 8px; }
@@ -1110,8 +1113,8 @@
     </div>
 
     <header>
-        <h1>Meu Organizador</h1>
-        <p>Planeje seu dia com leveza e praticidade</p>
+        <h1>💖 Organizador Daiane 💖</h1>
+        <p>Acredite que você é capaz. Confie em si mesma! ✨</p>
     </header>
 
     <div class="container">
@@ -1128,12 +1131,12 @@
                     <input type="hidden" id="tarefaId">
                     
                     <div class="form-grid">
-                        <div class="input-group full-width">
+                        <div class="input-group full-width full-on-mobile">
                             <label for="tarefa">O que precisa ser feito?</label>
                             <input type="text" id="tarefa" required placeholder="Ex: Estudar para a prova">
                         </div>
 
-                        <div class="input-group">
+                        <div class="input-group full-on-mobile">
                             <label for="categoria">Categoria</label>
                             <div class="category-wrapper">
                                 <select id="categoria" required>
@@ -1160,7 +1163,7 @@
                             <input type="time" id="horario">
                         </div>
 
-                        <div class="input-group">
+                        <div class="input-group full-on-mobile">
                             <label>Tempo Estimado (Opcional)</label>
                             <div class="time-inputs-wrapper">
                                 <div class="time-field">
