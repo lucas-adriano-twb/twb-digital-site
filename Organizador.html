@@ -37,7 +37,7 @@
             background-color: var(--color-bg);
             color: var(--color-text);
             line-height: 1.6;
-            padding-bottom: 80px; /* Margem extra para a barra de ações em massa */
+            padding-bottom: 80px; 
             overflow-x: hidden;
             width: 100%;
         }
@@ -69,6 +69,12 @@
             max-width: 1280px; 
             margin: 0 auto;
             padding: 0 20px;
+        }
+
+        /* Isolamento de Largura para Listas e Formulários */
+        .narrow-content {
+            max-width: 900px;
+            margin: 0 auto;
         }
 
         /* Formulário */
@@ -385,7 +391,7 @@
             font-size: 10px;
             font-weight: 600;
             cursor: pointer;
-            display: none; /* Só aparece no modo seleção */
+            display: none; 
         }
 
         body.selection-active .sub-group-select-btn {
@@ -399,11 +405,17 @@
             padding: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.03);
             display: flex;
-            align-items: flex-start;
-            flex-wrap: wrap; 
+            align-items: center; 
+            flex-wrap: nowrap;
             gap: 15px;
             border-left: 5px solid var(--color-blue);
             transition: transform 0.2s, background-color 0.3s;
+            position: relative; /* Base de ancoragem para Z-Index isolado e Menu Kebab */
+        }
+
+        /* Elevador de contexto Z-Index dinâmico: Ativado quando o menu dropdown abre */
+        .task-card.actions-open {
+            z-index: 100;
         }
 
         .task-card:hover {
@@ -429,7 +441,7 @@
             color: var(--color-dusty);
         }
 
-        /* Checkbox Padrão de Status */
+        /* Checkbox Vetorial Refinado */
         .checkbox-wrapper {
             position: relative;
             flex-shrink: 0;
@@ -438,14 +450,15 @@
 
         .checkbox-wrapper input[type="checkbox"] {
             appearance: none;
-            width: 24px;
-            height: 24px;
-            border: 2px solid var(--color-periwinkle);
-            border-radius: 6px;
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid var(--color-periwinkle);
+            border-radius: 5px;
             background-color: transparent;
             cursor: pointer;
             position: relative;
             transition: 0.2s;
+            margin: 0;
         }
 
         .checkbox-wrapper input[type="checkbox"]:checked {
@@ -454,16 +467,18 @@
         }
 
         .checkbox-wrapper input[type="checkbox"]:checked::after {
-            content: '✓';
+            content: '';
             position: absolute;
-            color: white;
-            font-size: 16px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            left: 5px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
         }
 
-        /* Checkbox de Seleção em Massa (Oculto por Padrão) */
+        /* Checkbox de Seleção em Massa */
         .bulk-checkbox-wrapper {
             display: none;
             position: relative;
@@ -475,26 +490,27 @@
             display: block;
         }
         body.selection-active .checkbox-wrapper {
-            display: none; /* Esconde o checkbox de concluir status */
+            display: none; 
         }
         body.selection-active .drag-handle {
-            display: none; /* Desabilita drag & drop visualmente no modo seleção */
+            display: none; 
         }
         body.selection-active .task-actions {
             opacity: 0.2;
-            pointer-events: none; /* Desabilita botões individuais */
+            pointer-events: none; 
         }
 
         .bulk-checkbox-wrapper input[type="checkbox"] {
             appearance: none;
-            width: 24px;
-            height: 24px;
-            border: 2px solid var(--color-pink);
-            border-radius: 6px;
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid var(--color-pink);
+            border-radius: 5px;
             background-color: transparent;
             cursor: pointer;
             position: relative;
             transition: 0.2s;
+            margin: 0;
         }
 
         .bulk-checkbox-wrapper input[type="checkbox"]:checked {
@@ -503,18 +519,20 @@
         }
 
         .bulk-checkbox-wrapper input[type="checkbox"]:checked::after {
-            content: '✓';
+            content: '';
             position: absolute;
-            color: white;
-            font-size: 16px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            left: 5px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
         }
 
         .task-content {
             flex: 1;
-            min-width: 180px; 
+            min-width: 0; 
         }
 
         .task-title {
@@ -522,13 +540,22 @@
             font-weight: 600;
             color: var(--color-dark-blue);
             margin-bottom: 8px;
+            word-wrap: break-word;
         }
 
+        /* Metadados: Impedindo deformação de layout com Nowrap Absoluto */
         .task-meta {
             display: flex;
             gap: 8px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             align-items: center;
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE and Edge */
+        }
+        
+        .task-meta::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
         }
 
         .task-meta span {
@@ -542,6 +569,7 @@
             color: var(--color-dusty);
             font-weight: 500;
             font-size: 12px;
+            flex-shrink: 0;
         }
 
         .task-card.overdue .task-meta span {
@@ -554,17 +582,36 @@
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
+            flex-shrink: 0;
+            /* Truncamento para evitar pushs longos se a tela for pequena demais */
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
         }
 
         .task-card.overdue .task-meta .badge {
             background-color: var(--color-danger-border);
         }
 
+        /* Ações Redesenhadas - Arquitetura Kebab Universal (Mobile + Desktop) */
         .task-actions {
             display: flex;
-            gap: 12px; 
-            flex-shrink: 0;
             align-items: center;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .action-buttons-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* Classes Utilitárias de Controle Condicional (Responsividade) */
+        .mobile-only-item {
+            display: none !important;
         }
 
         .icon-btn {
@@ -572,14 +619,18 @@
             border: none;
             cursor: pointer;
             color: var(--color-dusty);
-            font-size: 16px;
             transition: 0.2s;
-            width: 38px;  
-            height: 38px; 
+            width: 34px;  
+            height: 34px; 
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        .icon-btn svg {
+            width: 16px;
+            height: 16px;
         }
 
         .icon-btn:hover {
@@ -587,19 +638,55 @@
             background-color: var(--color-gray);
         }
         
-        .icon-btn.archive:hover {
-            color: var(--color-blue);
-            background-color: #e6f0fa;
+        .icon-btn.duplicate:hover { color: var(--color-purple); background-color: #f1e6fc; }
+
+        /* Menu Dropdown Universal (Substituindo o engarrafamento de 5 botões) */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background: var(--color-white);
+            border: 1px solid var(--color-gray);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            flex-direction: column;
+            min-width: 140px;
+            z-index: 1000;
+            overflow: hidden;
         }
 
-        .icon-btn.delete:hover {
-            color: #d9534f;
-            background-color: #fcebeb;
+        .task-actions.show-actions .dropdown-menu {
+            display: flex;
         }
-        
-        .icon-btn.duplicate:hover {
-            color: var(--color-purple);
-            background-color: #f1e6fc;
+
+        .dropdown-item {
+            background: none;
+            border: none;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-charcoal);
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .dropdown-item:hover {
+            background: var(--color-bg);
+        }
+
+        .dropdown-item.danger {
+            color: var(--color-danger-text);
+        }
+
+        .dropdown-item.danger:hover {
+            background: var(--color-danger-bg);
         }
 
         .badge-count {
@@ -683,12 +770,12 @@
         .drag-handle {
             cursor: grab;
             color: var(--color-lilac);
-            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             padding-right: 10px;
             transition: color 0.2s;
+            flex-shrink: 0;
         }
         .drag-handle:hover {
             color: var(--color-dark-blue);
@@ -700,6 +787,9 @@
         }
         .dnd-container {
             min-height: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px; 
         }
 
         /* Barra Flutuante de Ações em Massa */
@@ -859,7 +949,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 2000;
+            z-index: 5000;
             padding: 20px;
             backdrop-filter: blur(2px);
         }
@@ -933,7 +1023,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 3000;
+            z-index: 6000;
             font-weight: 600;
             color: var(--color-dark-blue);
             backdrop-filter: blur(2px);
@@ -943,8 +1033,10 @@
             display: none !important;
         }
 
+        /* Responsividade Extrema e Limpeza Mobile */
         @media (max-width: 768px) {
             .container { padding: 0 15px; }
+            .narrow-content { padding: 0; }
             .form-card { padding: 20px; }
             .form-grid { grid-template-columns: 1fr; }
             
@@ -952,12 +1044,17 @@
             .category-wrapper select { min-width: 100%; margin-bottom: 8px; }
             .category-wrapper button { flex: 1; padding: 12px 0; }
 
-            .task-actions {
-                width: 100%; 
-                justify-content: flex-end; 
-                padding-top: 15px;
-                margin-top: 5px;
-                border-top: 1px dashed var(--color-gray); 
+            /* Extingue a mecânica de arrasto esteticamente no mobile para não ocupar espaço */
+            .drag-handle { 
+                display: none !important; 
+            }
+
+            /* Em celulares, botões de ação em linha são escondidos e movidos nativamente para o Menu Kebab */
+            .desktop-only-btn {
+                display: none !important;
+            }
+            .mobile-only-item {
+                display: flex !important;
             }
             
             .weekly-grid {
@@ -1019,112 +1116,115 @@
 
     <div class="container">
         
-        <!-- Formulário -->
-        <div class="form-card">
-            <div class="form-title">
-                <span id="formActionTitle">Nova Tarefa</span>
-                <button type="button" class="action-btn" onclick="clearForm()" style="padding: 5px 15px; font-size: 12px;">Limpar</button>
-            </div>
-            
-            <form id="taskForm" onsubmit="submitTarefa(event)">
-                <input type="hidden" id="tarefaId">
-                
-                <div class="form-grid">
-                    <div class="input-group full-width">
-                        <label for="tarefa">O que precisa ser feito?</label>
-                        <input type="text" id="tarefa" required placeholder="Ex: Estudar para a prova">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="categoria">Categoria</label>
-                        <div class="category-wrapper">
-                            <select id="categoria" required>
-                                <option value="" disabled selected>Selecione...</option>
-                            </select>
-                            <button type="button" class="action-btn" onclick="toggleNewCategory()" title="Nova Categoria">+</button>
-                            <button type="button" class="action-btn" onclick="removeCurrentCategory()" title="Desativar Categoria Selecionada">-</button>
-                            <button type="button" class="action-btn" onclick="openReactivateModal()" title="Reativar Categorias">↺</button>
-                        </div>
-                        
-                        <div class="new-category-box" id="newCategoryBox">
-                            <input type="text" id="novaCategoriaInput" placeholder="Nome da nova categoria">
-                            <button type="button" class="action-btn" onclick="saveNewCategory()">Salvar</button>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="data">Data (Opcional)</label>
-                        <input type="date" id="data">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="horario">Horário (Opcional)</label>
-                        <input type="time" id="horario">
-                    </div>
-
-                    <div class="input-group">
-                        <label>Tempo Estimado (Opcional)</label>
-                        <div class="time-inputs-wrapper">
-                            <div class="time-field">
-                                <input type="number" id="tempoHoras" min="0" placeholder="0">
-                                <span>H</span>
-                            </div>
-                            <div class="time-field">
-                                <input type="number" id="tempoMinutos" min="0" max="59" placeholder="0">
-                                <span>MIN</span>
-                            </div>
-                        </div>
-                    </div>
+        <div class="narrow-content">
+            <!-- Formulário -->
+            <div class="form-card">
+                <div class="form-title">
+                    <span id="formActionTitle">Nova Tarefa</span>
+                    <button type="button" class="action-btn" onclick="clearForm()" style="padding: 5px 15px; font-size: 12px;">Limpar</button>
                 </div>
+                
+                <form id="taskForm" onsubmit="submitTarefa(event)">
+                    <input type="hidden" id="tarefaId">
+                    
+                    <div class="form-grid">
+                        <div class="input-group full-width">
+                            <label for="tarefa">O que precisa ser feito?</label>
+                            <input type="text" id="tarefa" required placeholder="Ex: Estudar para a prova">
+                        </div>
 
-                <button type="submit" class="btn-submit" id="btnSubmit">Salvar Tarefa</button>
-            </form>
+                        <div class="input-group">
+                            <label for="categoria">Categoria</label>
+                            <div class="category-wrapper">
+                                <select id="categoria" required>
+                                    <option value="" disabled selected>Selecione...</option>
+                                </select>
+                                <button type="button" class="action-btn" onclick="toggleNewCategory()" title="Nova Categoria">+</button>
+                                <button type="button" class="action-btn" onclick="removeCurrentCategory()" title="Desativar Categoria Selecionada">-</button>
+                                <button type="button" class="action-btn" onclick="openReactivateModal()" title="Reativar Categorias">↺</button>
+                            </div>
+                            
+                            <div class="new-category-box" id="newCategoryBox">
+                                <input type="text" id="novaCategoriaInput" placeholder="Nome da nova categoria">
+                                <button type="button" class="action-btn" onclick="saveNewCategory()">Salvar</button>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="data">Data (Opcional)</label>
+                            <input type="date" id="data">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="horario">Horário (Opcional)</label>
+                            <input type="time" id="horario">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Tempo Estimado (Opcional)</label>
+                            <div class="time-inputs-wrapper">
+                                <div class="time-field">
+                                    <input type="number" id="tempoHoras" min="0" placeholder="0">
+                                    <span>H</span>
+                                </div>
+                                <div class="time-field">
+                                    <input type="number" id="tempoMinutos" min="0" max="59" placeholder="0">
+                                    <span>MIN</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btnSubmit">Salvar Tarefa</button>
+                </form>
+            </div>
+
+            <!-- Filtros Globais (Listas) -->
+            <div class="filter-section">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label>Prazo:</label>
+                    <select id="filterDate" onchange="renderTarefas()">
+                        <option value="all">Todos os Prazos</option>
+                        <option value="atrasadas">Atrasadas</option>
+                        <option value="hoje">Hoje</option>
+                        <option value="amanha">Amanhã</option>
+                        <option value="futuro">Futuro</option>
+                        <option value="semData">Sem Data</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label style="margin-bottom: 8px; display: block;">Filtrar Múltiplas Categorias:</label>
+                    <div id="categoryFilters" class="filter-chips"></div>
+                </div>
+                
+                <div style="margin-left: auto;">
+                    <button class="bulk-toggle-btn" id="btnToggleBulk" onclick="toggleSelectionMode()">☰ Seleção Múltipla</button>
+                </div>
+            </div>
+
+            <!-- Pendentes -->
+            <div class="section-header" onclick="toggleSection('listaPendentes', this)">
+                <div class="title-area">
+                    Pendentes (Lista)
+                    <span class="badge-count" id="countPendentes">0</span>
+                </div>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="task-list" id="listaPendentes"></div>
+
+            <!-- Concluídas -->
+            <div class="section-header" onclick="toggleSection('listaConcluidas', this)">
+                <div class="title-area">
+                    Concluídas
+                    <span class="badge-count" id="countConcluidas">0</span>
+                </div>
+                <span class="toggle-icon rotated">▼</span>
+            </div>
+            <div class="task-list collapsed-list" id="listaConcluidas"></div>
         </div>
 
-        <!-- Filtros Globais (Listas) -->
-        <div class="filter-section">
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <label>Prazo:</label>
-                <select id="filterDate" onchange="renderTarefas()">
-                    <option value="all">Todos os Prazos</option>
-                    <option value="atrasadas">Atrasadas</option>
-                    <option value="hoje">Hoje</option>
-                    <option value="amanha">Amanhã</option>
-                    <option value="futuro">Futuro</option>
-                    <option value="semData">Sem Data</option>
-                </select>
-            </div>
-            
-            <div>
-                <label style="margin-bottom: 8px; display: block;">Filtrar Múltiplas Categorias:</label>
-                <div id="categoryFilters" class="filter-chips"></div>
-            </div>
-            
-            <div style="margin-left: auto;">
-                <button class="bulk-toggle-btn" id="btnToggleBulk" onclick="toggleSelectionMode()">☰ Seleção Múltipla</button>
-            </div>
-        </div>
-
-        <!-- Pendentes -->
-        <div class="section-header" onclick="toggleSection('listaPendentes', this)">
-            <div class="title-area">
-                Pendentes (Lista)
-                <span class="badge-count" id="countPendentes">0</span>
-            </div>
-            <span class="toggle-icon">▼</span>
-        </div>
-        <div class="task-list" id="listaPendentes"></div>
-
-        <!-- Concluídas -->
-        <div class="section-header" onclick="toggleSection('listaConcluidas', this)">
-            <div class="title-area">
-                Concluídas
-                <span class="badge-count" id="countConcluidas">0</span>
-            </div>
-            <span class="toggle-icon rotated">▼</span>
-        </div>
-        <div class="task-list collapsed-list" id="listaConcluidas"></div>
-
+        <!-- Visão Semanal e Dashboards escapam do constrangimento de largura -->
         <!-- Visão Semanal -->
         <div class="section-header" onclick="toggleSection('weeklyView', this)">
             <div class="title-area">
@@ -1184,8 +1284,39 @@
         // Estado do Modo de Seleção Múltipla
         let isSelectionMode = false;
         let selectedTaskIds = new Set();
-
         let modalCallback = null;
+
+        // Auto Fechamento do Menu Kebab ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.task-actions')) {
+                document.querySelectorAll('.task-actions.show-actions').forEach(el => {
+                    el.classList.remove('show-actions');
+                    const card = el.closest('.task-card');
+                    if (card) card.classList.remove('actions-open');
+                });
+            }
+        });
+
+        function toggleCardActions(id) {
+            // Fecha qualquer outro aberto
+            document.querySelectorAll('.task-actions.show-actions').forEach(el => {
+                if (el.id !== 'actions-' + id) {
+                    el.classList.remove('show-actions');
+                    el.closest('.task-card').classList.remove('actions-open');
+                }
+            });
+            
+            const actionsDiv = document.getElementById('actions-' + id);
+            const card = actionsDiv.closest('.task-card');
+            
+            if (actionsDiv.classList.contains('show-actions')) {
+                actionsDiv.classList.remove('show-actions');
+                card.classList.remove('actions-open');
+            } else {
+                actionsDiv.classList.add('show-actions');
+                card.classList.add('actions-open'); // Eleva o z-index dinamicamente
+            }
+        }
 
         function showModal(title, message, btnText, btnClass, callback) {
             document.getElementById('modalTitle').textContent = title;
@@ -1368,12 +1499,12 @@
                     showLoader(true);
                     const idsToProcess = Array.from(selectedTaskIds);
                     
-                    // Optimistic UI Update (Remove visulamente imediato)
+                    // Optimistic UI Update
                     state.tarefas = state.tarefas.filter(t => !idsToProcess.includes(t.id));
                     selectedTaskIds.clear();
-                    toggleSelectionMode(); // Desliga o modo
+                    toggleSelectionMode(); 
                     
-                    // Execução Backend Sequencial (Evita Rate Limit do Apps Script)
+                    // Execução Backend Sequencial
                     for (const id of idsToProcess) {
                         const payloadAction = actionType === 'archive' ? 'archiveTarefa' : 'deleteTarefa';
                         await fetchAPI({ action: payloadAction, id: id });
@@ -1453,8 +1584,18 @@
             
             const isCheckedSelection = selectedTaskIds.has(t.id) ? 'checked' : '';
 
+            // Oculta a alça de arrasto se a tarefa estiver concluída e utiliza SVG refinado
+            const dragIcon = !t.concluida ? `
+                <div class="drag-handle" title="Segure para arrastar">
+                    <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor">
+                        <circle cx="4" cy="4" r="1.5"/><circle cx="10" cy="4" r="1.5"/>
+                        <circle cx="4" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/>
+                        <circle cx="4" cy="16" r="1.5"/><circle cx="10" cy="16" r="1.5"/>
+                    </svg>
+                </div>` : '';
+
             return `
-                <div class="drag-handle" title="Segure para arrastar">⋮⋮</div>
+                ${dragIcon}
                 <div class="bulk-checkbox-wrapper">
                     <input type="checkbox" class="bulk-checkbox-${bucketTemporal}" value="${t.id}" ${isCheckedSelection} onchange="toggleTaskSelection('${t.id}')">
                 </div>
@@ -1464,17 +1605,30 @@
                 <div class="task-content">
                     <div class="task-title">${t.tarefa}</div>
                     <div class="task-meta">
-                        <span class="badge">${t.categoria}</span>
+                        <span class="badge" title="${t.categoria}">${t.categoria}</span>
                         ${dataDisplay}
                         ${horaDisplay}
                         ${tempoDisplay}
                     </div>
                 </div>
-                <div class="task-actions">
-                    <button class="icon-btn duplicate" onclick="duplicateTarefa('${t.id}')" title="Duplicar">⧉</button>
-                    <button class="icon-btn" onclick="editTarefa('${t.id}')" title="Editar">✎</button>
-                    <button class="icon-btn archive" onclick="archiveTarefa('${t.id}')" title="Arquivar">📦</button>
-                    <button class="icon-btn delete" onclick="deleteTarefa('${t.id}')" title="Excluir">🗑</button>
+                <div class="task-actions" id="actions-${t.id}">
+                    <div class="action-buttons-group">
+                        <button class="icon-btn duplicate desktop-only-btn" onclick="duplicateTarefa('${t.id}')" title="Duplicar">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button class="icon-btn desktop-only-btn" onclick="editTarefa('${t.id}')" title="Editar">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <button class="icon-btn action-toggle-btn" onclick="toggleCardActions('${t.id}')" title="Opções">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="5" r="1.5"></circle><circle cx="12" cy="19" r="1.5"></circle></svg>
+                        </button>
+                    </div>
+                    <div class="dropdown-menu">
+                        <button class="dropdown-item mobile-only-item" onclick="duplicateTarefa('${t.id}')">⧉ Duplicar</button>
+                        <button class="dropdown-item mobile-only-item" onclick="editTarefa('${t.id}')">✎ Editar</button>
+                        <button class="dropdown-item" onclick="archiveTarefa('${t.id}')">📦 Arquivar</button>
+                        <button class="dropdown-item danger" onclick="deleteTarefa('${t.id}')">🗑 Excluir</button>
+                    </div>
                 </div>
             `;
         }
@@ -1518,10 +1672,8 @@
             };
 
             state.tarefas.forEach(t => {
-                // Filtros Globais
                 if (state.selectedCategoryFilters.length > 0 && !state.selectedCategoryFilters.includes(t.categoria)) return; 
                 
-                // Classificação Temporal Pendentes vs Concluidas
                 let bucketTemporal = 'semData';
                 
                 if (!t.concluida) {
@@ -1533,12 +1685,10 @@
                     }
                     if (dateFilter !== 'all' && bucketTemporal !== dateFilter) return; 
                 } else {
-                    // Lógica de Semanas para Concluídas (Baseada na Data Limite / Due Date configurada na tarefa)
                     if (!t.data || t.data >= startOfThisWeekStr) bucketTemporal = 'estaSemana';
                     else if (t.data >= startOfLastWeekStr && t.data < startOfThisWeekStr) bucketTemporal = 'semanaPassada';
                     else bucketTemporal = 'antigas';
                     
-                    // Se o filtro global de data for "Sem Data", ignora as concluídas datadas para limpar a tela
                     if (dateFilter === 'semData' && t.data) return;
                 }
 
@@ -1548,7 +1698,6 @@
                 
                 card.innerHTML = buildCardHTML(t, bucketTemporal);
 
-                // Configuração de Drag & Drop para o card (Apenas Pendentes)
                 if (!t.concluida) {
                     card.setAttribute('draggable', 'true');
                     card.dataset.id = t.id;
@@ -1570,7 +1719,6 @@
                 }
             });
 
-            // Injeção Pendentes
             ['atrasadas', 'hoje', 'amanha', 'futuro', 'semData'].forEach(key => {
                 const grupo = gruposPendentes[key];
                 if (grupo.items.length > 0) {
@@ -1592,7 +1740,6 @@
                 }
             });
 
-            // Injeção Concluídas (Agrupamento Semanal)
             ['estaSemana', 'semanaPassada', 'antigas'].forEach(key => {
                 const grupo = gruposConcluidas[key];
                 if (grupo.items.length > 0) {
@@ -1842,7 +1989,7 @@
             const t = state.tarefas.find(x => x.id === id);
             if (!t) return;
 
-            document.getElementById('tarefaId').value = ''; // ID Vazio garante a criação
+            document.getElementById('tarefaId').value = ''; 
             document.getElementById('tarefa').value = t.tarefa + ' (Cópia)';
             document.getElementById('data').value = t.data;
             document.getElementById('horario').value = formatTimeValue(t.horario);
@@ -1965,7 +2112,6 @@
             const index = state.tarefas.findIndex(t => t.id === id);
             state.tarefas[index].concluida = isChecked;
             renderTarefas(); 
-            // Executa em Background para não travar a UI
             fetchAPI({ action: 'toggleConcluida', id: id, status: isChecked });
         }
 
