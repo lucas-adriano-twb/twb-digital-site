@@ -37,7 +37,7 @@
             background-color: var(--color-bg);
             color: var(--color-text);
             line-height: 1.6;
-            padding-bottom: 50px;
+            padding-bottom: 80px; /* Margem extra para a barra de ações em massa */
             overflow-x: hidden;
             width: 100%;
         }
@@ -245,7 +245,9 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
             margin-bottom: 30px;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
             gap: 15px;
         }
 
@@ -294,6 +296,22 @@
             background-color: var(--color-periwinkle);
             color: var(--color-white);
             border-color: var(--color-dark-blue);
+        }
+
+        /* Toggle Seleção em Massa */
+        .bulk-toggle-btn {
+            background-color: var(--color-purple);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .bulk-toggle-btn.active {
+            background-color: var(--color-charcoal);
         }
 
         /* Listas e Accordion */
@@ -355,7 +373,23 @@
             border-bottom: 1px solid var(--color-gray);
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+        }
+
+        .sub-group-select-btn {
+            background: none;
+            border: 1px solid var(--color-periwinkle);
+            color: var(--color-periwinkle);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: none; /* Só aparece no modo seleção */
+        }
+
+        body.selection-active .sub-group-select-btn {
+            display: block;
         }
 
         /* Cards Refatorados */
@@ -395,6 +429,7 @@
             color: var(--color-dusty);
         }
 
+        /* Checkbox Padrão de Status */
         .checkbox-wrapper {
             position: relative;
             flex-shrink: 0;
@@ -419,6 +454,55 @@
         }
 
         .checkbox-wrapper input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 16px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Checkbox de Seleção em Massa (Oculto por Padrão) */
+        .bulk-checkbox-wrapper {
+            display: none;
+            position: relative;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        body.selection-active .bulk-checkbox-wrapper {
+            display: block;
+        }
+        body.selection-active .checkbox-wrapper {
+            display: none; /* Esconde o checkbox de concluir status */
+        }
+        body.selection-active .drag-handle {
+            display: none; /* Desabilita drag & drop visualmente no modo seleção */
+        }
+        body.selection-active .task-actions {
+            opacity: 0.2;
+            pointer-events: none; /* Desabilita botões individuais */
+        }
+
+        .bulk-checkbox-wrapper input[type="checkbox"] {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--color-pink);
+            border-radius: 6px;
+            background-color: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: 0.2s;
+        }
+
+        .bulk-checkbox-wrapper input[type="checkbox"]:checked {
+            background-color: var(--color-pink);
+            border-color: var(--color-pink);
+        }
+
+        .bulk-checkbox-wrapper input[type="checkbox"]:checked::after {
             content: '✓';
             position: absolute;
             color: white;
@@ -511,6 +595,11 @@
         .icon-btn.delete:hover {
             color: #d9534f;
             background-color: #fcebeb;
+        }
+        
+        .icon-btn.duplicate:hover {
+            color: var(--color-purple);
+            background-color: #f1e6fc;
         }
 
         .badge-count {
@@ -611,6 +700,53 @@
         }
         .dnd-container {
             min-height: 10px;
+        }
+
+        /* Barra Flutuante de Ações em Massa */
+        .bulk-action-bar {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--color-dark-blue);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            z-index: 4000;
+            transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        body.selection-active .bulk-action-bar {
+            bottom: 20px;
+        }
+
+        .bulk-action-bar span {
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .bulk-action-bar button {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+        .bulk-action-bar button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .bulk-action-bar .btn-bulk-danger:hover {
+            background: var(--color-danger-border);
+            border-color: var(--color-danger-border);
         }
 
         /* Dashboard e Estatísticas */
@@ -839,6 +975,7 @@
             
             .dashboard-grid { grid-template-columns: 1fr; }
             .kpi-container { flex-direction: column; }
+            .bulk-action-bar { width: 90%; flex-wrap: wrap; justify-content: center; }
         }
     </style>
 </head>
@@ -962,6 +1099,10 @@
                 <label style="margin-bottom: 8px; display: block;">Filtrar Múltiplas Categorias:</label>
                 <div id="categoryFilters" class="filter-chips"></div>
             </div>
+            
+            <div style="margin-left: auto;">
+                <button class="bulk-toggle-btn" id="btnToggleBulk" onclick="toggleSelectionMode()">☰ Seleção Múltipla</button>
+            </div>
         </div>
 
         <!-- Pendentes -->
@@ -1023,6 +1164,14 @@
 
     </div>
 
+    <!-- Barra Flutuante de Ações em Massa -->
+    <div class="bulk-action-bar" id="bulkActionBar">
+        <span id="bulkCountLabel">0 selecionadas</span>
+        <button onclick="executeBulkAction('archive')">📦 Arquivar</button>
+        <button onclick="executeBulkAction('delete')" class="btn-bulk-danger">🗑 Excluir</button>
+        <button onclick="toggleSelectionMode()" style="background:transparent; border:none; padding:0; margin-left:5px; font-size: 16px;">✕</button>
+    </div>
+
     <script>
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBDmm4skxObab4KsC1NgKpSqnV9hCH-_-tGKyXy8J2s32OpRcElmlzd5R9RTfQxIlByw/exec'; 
 
@@ -1031,6 +1180,10 @@
             categorias: [],
             selectedCategoryFilters: [] 
         };
+
+        // Estado do Modo de Seleção Múltipla
+        let isSelectionMode = false;
+        let selectedTaskIds = new Set();
 
         let modalCallback = null;
 
@@ -1055,7 +1208,6 @@
         });
 
         async function fetchAPI(payload) {
-            showLoader(true);
             try {
                 const response = await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
@@ -1066,20 +1218,19 @@
                 if(result.status === 'error') {
                     showModal('Erro', result.message, 'OK', '', () => {});
                 }
-                showLoader(false);
                 return result.data;
             } catch (error) {
-                showLoader(false);
                 showModal('Erro de Conexão', 'Não foi possível conectar.', 'OK', '', () => {});
                 console.error(error);
             }
         }
 
         window.onload = async () => {
+            showLoader(true);
             await loadData();
+            showLoader(false);
         };
 
-        // Função responsável por gerenciar a ordem local das tarefas
         function saveLocalOrder() {
             const order = state.tarefas.map(t => t.id);
             localStorage.setItem('organizador_tarefas_order', JSON.stringify(order));
@@ -1091,7 +1242,6 @@
                 state.tarefas = data.tarefas;
                 state.categorias = data.categorias;
 
-                // Aplica a ordenação visual salva no navegador
                 const savedOrder = JSON.parse(localStorage.getItem('organizador_tarefas_order'));
                 if (savedOrder && Array.isArray(savedOrder)) {
                     state.tarefas.sort((a, b) => {
@@ -1147,6 +1297,95 @@
         }
 
         // ==========================================
+        // GESTÃO DE MÚLTIPLA SELEÇÃO EM MASSA
+        // ==========================================
+        
+        function toggleSelectionMode() {
+            isSelectionMode = !isSelectionMode;
+            selectedTaskIds.clear();
+            
+            const btn = document.getElementById('btnToggleBulk');
+            if (isSelectionMode) {
+                document.body.classList.add('selection-active');
+                btn.classList.add('active');
+                btn.textContent = "✕ Cancelar Seleção";
+            } else {
+                document.body.classList.remove('selection-active');
+                btn.classList.remove('active');
+                btn.textContent = "☰ Seleção Múltipla";
+            }
+            
+            updateBulkActionBar();
+            renderTarefas(); 
+        }
+
+        function toggleTaskSelection(id) {
+            if (selectedTaskIds.has(id)) {
+                selectedTaskIds.delete(id);
+            } else {
+                selectedTaskIds.add(id);
+            }
+            updateBulkActionBar();
+        }
+
+        function selectAllInGroup(groupClass, listId) {
+            const container = document.getElementById(listId);
+            const checkboxes = container.querySelectorAll(`.bulk-checkbox-${groupClass}`);
+            
+            let allSelected = true;
+            checkboxes.forEach(cb => {
+                if (!selectedTaskIds.has(cb.value)) allSelected = false;
+            });
+
+            checkboxes.forEach(cb => {
+                if (allSelected) {
+                    selectedTaskIds.delete(cb.value);
+                    cb.checked = false;
+                } else {
+                    selectedTaskIds.add(cb.value);
+                    cb.checked = true;
+                }
+            });
+            updateBulkActionBar();
+        }
+
+        function updateBulkActionBar() {
+            document.getElementById('bulkCountLabel').textContent = `${selectedTaskIds.size} selecionadas`;
+        }
+
+        async function executeBulkAction(actionType) {
+            if (selectedTaskIds.size === 0) return;
+            
+            const actionName = actionType === 'archive' ? 'arquivar' : 'excluir';
+            const btnClass = actionType === 'archive' ? 'btn-archive' : 'btn-danger';
+            
+            showModal(
+                "Ação em Massa", 
+                `Tem certeza que deseja ${actionName} ${selectedTaskIds.size} tarefa(s)? Isso não pode ser desfeito rapidamente.`, 
+                "Confirmar", 
+                btnClass, 
+                async () => {
+                    showLoader(true);
+                    const idsToProcess = Array.from(selectedTaskIds);
+                    
+                    // Optimistic UI Update (Remove visulamente imediato)
+                    state.tarefas = state.tarefas.filter(t => !idsToProcess.includes(t.id));
+                    selectedTaskIds.clear();
+                    toggleSelectionMode(); // Desliga o modo
+                    
+                    // Execução Backend Sequencial (Evita Rate Limit do Apps Script)
+                    for (const id of idsToProcess) {
+                        const payloadAction = actionType === 'archive' ? 'archiveTarefa' : 'deleteTarefa';
+                        await fetchAPI({ action: payloadAction, id: id });
+                    }
+                    
+                    saveLocalOrder();
+                    showLoader(false);
+                }
+            );
+        }
+
+        // ==========================================
         // RENDERIZAÇÃO DA UI E LÓGICA
         // ==========================================
 
@@ -1189,6 +1428,57 @@
             renderTarefas(); 
         }
 
+        function buildCardHTML(t, bucketTemporal) {
+            let dataDisplay = '';
+            if(t.data) {
+                const [y, m, d] = t.data.split('-');
+                dataDisplay = `<span>📅 ${d}/${m}</span>`;
+            }
+
+            let horaDisplay = '';
+            let horaLimpa = formatTimeValue(t.horario);
+            if (horaLimpa) {
+                horaDisplay = `<span>⏰ ${horaLimpa}</span>`;
+            }
+
+            let tempoDisplay = '';
+            if (t.tempo) {
+                let totalMinutos = parseInt(t.tempo);
+                if (!isNaN(totalMinutos) && totalMinutos > 0) {
+                    tempoDisplay = `<span>⏳ ${formatMinutesToHours(totalMinutos)}</span>`;
+                } else if (isNaN(totalMinutos) && typeof t.tempo === 'string') {
+                    tempoDisplay = `<span>⏳ ${t.tempo}</span>`;
+                }
+            }
+            
+            const isCheckedSelection = selectedTaskIds.has(t.id) ? 'checked' : '';
+
+            return `
+                <div class="drag-handle" title="Segure para arrastar">⋮⋮</div>
+                <div class="bulk-checkbox-wrapper">
+                    <input type="checkbox" class="bulk-checkbox-${bucketTemporal}" value="${t.id}" ${isCheckedSelection} onchange="toggleTaskSelection('${t.id}')">
+                </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" ${t.concluida ? 'checked' : ''} onchange="toggleStatus('${t.id}', this.checked)">
+                </div>
+                <div class="task-content">
+                    <div class="task-title">${t.tarefa}</div>
+                    <div class="task-meta">
+                        <span class="badge">${t.categoria}</span>
+                        ${dataDisplay}
+                        ${horaDisplay}
+                        ${tempoDisplay}
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <button class="icon-btn duplicate" onclick="duplicateTarefa('${t.id}')" title="Duplicar">⧉</button>
+                    <button class="icon-btn" onclick="editTarefa('${t.id}')" title="Editar">✎</button>
+                    <button class="icon-btn archive" onclick="archiveTarefa('${t.id}')" title="Arquivar">📦</button>
+                    <button class="icon-btn delete" onclick="deleteTarefa('${t.id}')" title="Excluir">🗑</button>
+                </div>
+            `;
+        }
+
         function renderTarefas() {
             const listPendentes = document.getElementById('listaPendentes');
             const listConcluidas = document.getElementById('listaConcluidas');
@@ -1198,9 +1488,17 @@
             const dateFilter = document.getElementById('filterDate').value;
             const todayObj = new Date();
             const todayStr = getLocalYYYYMMDD(todayObj);
+            
             const tomorrowObj = new Date(todayObj);
             tomorrowObj.setDate(tomorrowObj.getDate() + 1);
             const tomorrowStr = getLocalYYYYMMDD(tomorrowObj);
+            
+            const startOfThisWeekObj = getStartOfWeek(todayObj);
+            const startOfThisWeekStr = getLocalYYYYMMDD(startOfThisWeekObj);
+            
+            const startOfLastWeekObj = new Date(startOfThisWeekObj);
+            startOfLastWeekObj.setDate(startOfLastWeekObj.getDate() - 7);
+            const startOfLastWeekStr = getLocalYYYYMMDD(startOfLastWeekObj);
 
             let pendentesCount = 0;
             let concluidasCount = 0;
@@ -1212,105 +1510,81 @@
                 futuro: { label: "🔵 Futuro", items: [] },
                 semData: { label: "⚪ Sem Data", items: [] }
             };
+            
+            const gruposConcluidas = {
+                estaSemana: { label: "📅 Esta Semana", items: [] },
+                semanaPassada: { label: "📅 Semana Passada", items: [] },
+                antigas: { label: "🕰️ Mais Antigas", items: [] }
+            };
 
             state.tarefas.forEach(t => {
-                let bucketTemporal = 'semData';
-                if (t.data) {
-                    if (t.data < todayStr) bucketTemporal = 'atrasadas';
-                    else if (t.data === todayStr) bucketTemporal = 'hoje';
-                    else if (t.data === tomorrowStr) bucketTemporal = 'amanha';
-                    else bucketTemporal = 'futuro';
-                }
-
+                // Filtros Globais
                 if (state.selectedCategoryFilters.length > 0 && !state.selectedCategoryFilters.includes(t.categoria)) return; 
-                if (dateFilter !== 'all' && bucketTemporal !== dateFilter) return; 
+                
+                // Classificação Temporal Pendentes vs Concluidas
+                let bucketTemporal = 'semData';
+                
+                if (!t.concluida) {
+                    if (t.data) {
+                        if (t.data < todayStr) bucketTemporal = 'atrasadas';
+                        else if (t.data === todayStr) bucketTemporal = 'hoje';
+                        else if (t.data === tomorrowStr) bucketTemporal = 'amanha';
+                        else bucketTemporal = 'futuro';
+                    }
+                    if (dateFilter !== 'all' && bucketTemporal !== dateFilter) return; 
+                } else {
+                    // Lógica de Semanas para Concluídas (Baseada na Data Limite / Due Date configurada na tarefa)
+                    if (!t.data || t.data >= startOfThisWeekStr) bucketTemporal = 'estaSemana';
+                    else if (t.data >= startOfLastWeekStr && t.data < startOfThisWeekStr) bucketTemporal = 'semanaPassada';
+                    else bucketTemporal = 'antigas';
+                    
+                    // Se o filtro global de data for "Sem Data", ignora as concluídas datadas para limpar a tela
+                    if (dateFilter === 'semData' && t.data) return;
+                }
 
                 const card = document.createElement('div');
                 card.className = `task-card ${t.concluida ? 'completed' : ''}`;
+                if (bucketTemporal === 'atrasadas' && !t.concluida) card.classList.add('overdue');
                 
-                if (bucketTemporal === 'atrasadas' && !t.concluida) {
-                    card.classList.add('overdue');
-                }
-                
-                let dataDisplay = '';
-                if(t.data) {
-                    const [y, m, d] = t.data.split('-');
-                    dataDisplay = `<span>📅 ${d}/${m}</span>`;
-                }
+                card.innerHTML = buildCardHTML(t, bucketTemporal);
 
-                let horaDisplay = '';
-                let horaLimpa = formatTimeValue(t.horario);
-                if (horaLimpa) {
-                    horaDisplay = `<span>⏰ ${horaLimpa}</span>`;
-                }
+                // Configuração de Drag & Drop para o card (Apenas Pendentes)
+                if (!t.concluida) {
+                    card.setAttribute('draggable', 'true');
+                    card.dataset.id = t.id;
+                    card.dataset.grupo = bucketTemporal;
 
-                let tempoDisplay = '';
-                if (t.tempo) {
-                    let totalMinutos = parseInt(t.tempo);
-                    if (!isNaN(totalMinutos) && totalMinutos > 0) {
-                        tempoDisplay = `<span>⏳ ${formatMinutesToHours(totalMinutos)}</span>`;
-                    } else if (isNaN(totalMinutos) && typeof t.tempo === 'string') {
-                        tempoDisplay = `<span>⏳ ${t.tempo}</span>`;
-                    }
-                }
+                    card.addEventListener('dragstart', (e) => {
+                        if(isSelectionMode) { e.preventDefault(); return; }
+                        e.dataTransfer.effectAllowed = 'move';
+                        card.dataset.origSibling = card.nextElementSibling ? card.nextElementSibling.dataset.id : 'null';
+                        setTimeout(() => card.classList.add('dragging'), 0);
+                    });
 
-                card.innerHTML = `
-                    <div class="drag-handle" title="Segure para arrastar">⋮⋮</div>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" ${t.concluida ? 'checked' : ''} onchange="toggleStatus('${t.id}', this.checked)">
-                    </div>
-                    <div class="task-content">
-                        <div class="task-title">${t.tarefa}</div>
-                        <div class="task-meta">
-                            <span class="badge">${t.categoria}</span>
-                            ${dataDisplay}
-                            ${horaDisplay}
-                            ${tempoDisplay}
-                        </div>
-                    </div>
-                    <div class="task-actions">
-                        <button class="icon-btn" onclick="editTarefa('${t.id}')" title="Editar">✎</button>
-                        <button class="icon-btn archive" onclick="archiveTarefa('${t.id}')" title="Arquivar">📦</button>
-                        <button class="icon-btn delete" onclick="deleteTarefa('${t.id}')" title="Excluir">🗑</button>
-                    </div>
-                `;
-
-                // Configuração de Drag & Drop para o card
-                card.setAttribute('draggable', 'true');
-                card.dataset.id = t.id;
-                card.dataset.grupo = bucketTemporal;
-
-                card.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.effectAllowed = 'move';
-                    card.dataset.origSibling = card.nextElementSibling ? card.nextElementSibling.dataset.id : 'null';
-                    setTimeout(() => card.classList.add('dragging'), 0);
-                });
-
-                card.addEventListener('dragend', () => {
-                    card.classList.remove('dragging');
-                });
-
-                if (t.concluida) {
-                    listConcluidas.appendChild(card);
-                    concluidasCount++;
-                } else {
+                    card.addEventListener('dragend', () => card.classList.remove('dragging'));
                     gruposPendentes[bucketTemporal].items.push(card);
                     pendentesCount++;
+                } else {
+                    gruposConcluidas[bucketTemporal].items.push(card);
+                    concluidasCount++;
                 }
             });
 
+            // Injeção Pendentes
             ['atrasadas', 'hoje', 'amanha', 'futuro', 'semData'].forEach(key => {
                 const grupo = gruposPendentes[key];
                 if (grupo.items.length > 0) {
-                    const tituloGrupo = document.createElement('div');
-                    tituloGrupo.className = 'sub-group-header';
-                    tituloGrupo.textContent = grupo.label;
-                    listPendentes.appendChild(tituloGrupo);
+                    const header = document.createElement('div');
+                    header.className = 'sub-group-header';
+                    header.innerHTML = `
+                        <span>${grupo.label}</span>
+                        <button class="sub-group-select-btn" onclick="selectAllInGroup('${key}', 'listaPendentes')">Selecionar Grupo</button>
+                    `;
+                    listPendentes.appendChild(header);
                     
                     const groupWrapper = document.createElement('div');
                     groupWrapper.className = 'dnd-container';
                     groupWrapper.dataset.grupo = key;
-                    
                     setupDnD(groupWrapper);
                     
                     grupo.items.forEach(card => groupWrapper.appendChild(card));
@@ -1318,8 +1592,23 @@
                 }
             });
 
-            if(pendentesCount === 0) listPendentes.innerHTML = '<p style="color: var(--color-lilac); font-size: 14px; margin-top:10px;">Nenhuma tarefa encontrada.</p>';
-            if(concluidasCount === 0) listConcluidas.innerHTML = '<p style="color: var(--color-lilac); font-size: 14px; margin-top:10px;">Nenhuma tarefa encontrada.</p>';
+            // Injeção Concluídas (Agrupamento Semanal)
+            ['estaSemana', 'semanaPassada', 'antigas'].forEach(key => {
+                const grupo = gruposConcluidas[key];
+                if (grupo.items.length > 0) {
+                    const header = document.createElement('div');
+                    header.className = 'sub-group-header';
+                    header.innerHTML = `
+                        <span>${grupo.label}</span>
+                        <button class="sub-group-select-btn" onclick="selectAllInGroup('${key}', 'listaConcluidas')">Selecionar Grupo</button>
+                    `;
+                    listConcluidas.appendChild(header);
+                    grupo.items.forEach(card => listConcluidas.appendChild(card));
+                }
+            });
+
+            if(pendentesCount === 0) listPendentes.innerHTML = '<p style="color: var(--color-lilac); font-size: 14px; margin-top:10px;">Nenhuma tarefa pendente encontrada.</p>';
+            if(concluidasCount === 0) listConcluidas.innerHTML = '<p style="color: var(--color-lilac); font-size: 14px; margin-top:10px;">Nenhuma tarefa concluída encontrada.</p>';
 
             document.getElementById('countPendentes').textContent = pendentesCount;
             document.getElementById('countConcluidas').textContent = concluidasCount;
@@ -1378,7 +1667,6 @@
             }
         }
 
-        // Nova Lógica do Dashboard: Isolada de Filtros Globais, focada em Produtividade
         function renderDashboard() {
             const period = document.getElementById('dashboardPeriodFilter').value;
             const containerTasks = document.getElementById('dashTaskStats');
@@ -1395,7 +1683,6 @@
             const endOfMonthObj = new Date(todayObj.getFullYear(), todayObj.getMonth() + 1, 0);
             const endOfMonthStr = getLocalYYYYMMDD(endOfMonthObj);
 
-            // Escopo Exclusivo do Dashboard: Apenas tarefas CONCLUÍDAS são relevantes para a produtividade real
             let productivityTasks = state.tarefas.filter(t => {
                 if (!t.concluida) return false; 
                 if (!t.data) return period === 'all';
@@ -1424,7 +1711,6 @@
             const diasProdutivos = diasUnicos.size;
             const mediaMinutosPorDia = diasProdutivos > 0 ? Math.round(totalMinutosGeral / diasProdutivos) : 0;
 
-            // Card 1: KPIs de Produtividade (Substitui Status Concluídas vs Pendentes)
             containerTasks.innerHTML = `
                 <h4>Visão Geral</h4>
                 <div class="kpi-container">
@@ -1443,7 +1729,6 @@
                 </div>
             `;
 
-            // Card 2: Horas de Estudo/Trabalho por Matéria
             const arrayCategorias = Object.keys(tempoPorCategoria).map(cat => {
                 const tempo = tempoPorCategoria[cat];
                 if (tempo > maxTempoCategoria) maxTempoCategoria = tempo;
@@ -1506,9 +1791,11 @@
 
         async function executeReactivate(nome) {
             closeReactivateModal();
+            showLoader(true);
             await fetchAPI({ action: 'addCategoria', nome: nome });
             if (!state.categorias.includes(nome)) state.categorias.push(nome);
             renderCategorias();
+            showLoader(false);
             showModal("Sucesso", `A categoria "${nome}" foi restaurada e está pronta para uso!`, "Legal", "", () => {});
         }
 
@@ -1521,6 +1808,7 @@
 
         async function submitTarefa(e) {
             e.preventDefault();
+            showLoader(true);
             const id = document.getElementById('tarefaId').value;
             const inputHoras = parseInt(document.getElementById('tempoHoras').value) || 0;
             const inputMinutos = parseInt(document.getElementById('tempoMinutos').value) || 0;
@@ -1547,6 +1835,38 @@
             saveLocalOrder();
             clearForm();
             renderTarefas();
+            showLoader(false);
+        }
+
+        function duplicateTarefa(id) {
+            const t = state.tarefas.find(x => x.id === id);
+            if (!t) return;
+
+            document.getElementById('tarefaId').value = ''; // ID Vazio garante a criação
+            document.getElementById('tarefa').value = t.tarefa + ' (Cópia)';
+            document.getElementById('data').value = t.data;
+            document.getElementById('horario').value = formatTimeValue(t.horario);
+            
+            if (t.tempo && !isNaN(parseInt(t.tempo))) {
+                document.getElementById('tempoHoras').value = Math.floor(t.tempo / 60) || '';
+                document.getElementById('tempoMinutos').value = t.tempo % 60 || '';
+            } else {
+                document.getElementById('tempoHoras').value = '';
+                document.getElementById('tempoMinutos').value = '';
+            }
+            
+            const select = document.getElementById('categoria');
+            if (!state.categorias.includes(t.categoria)) {
+                const option = document.createElement('option');
+                option.value = t.categoria;
+                option.textContent = t.categoria + ' (Inativa)';
+                select.appendChild(option);
+            }
+            select.value = t.categoria;
+            document.getElementById('formActionTitle').textContent = "Nova Tarefa (Duplicada)";
+            document.getElementById('btnSubmit').textContent = "Salvar Tarefa";
+            document.getElementById('tarefa').focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function editTarefa(id) {
@@ -1610,11 +1930,7 @@
                 if (draggable.dataset.origSibling === targetId) return;
 
                 reorderState(draggedId, targetId);
-                
-                // Salvamento na memória local para evitar corromper o Google Sheets
                 saveLocalOrder();
-                
-                // Recarrega o componente visual integral para que todas as abas reflitam as novas posições
                 renderTarefas();
             });
         }
@@ -1649,24 +1965,29 @@
             const index = state.tarefas.findIndex(t => t.id === id);
             state.tarefas[index].concluida = isChecked;
             renderTarefas(); 
-            await fetchAPI({ action: 'toggleConcluida', id: id, status: isChecked });
+            // Executa em Background para não travar a UI
+            fetchAPI({ action: 'toggleConcluida', id: id, status: isChecked });
         }
 
         function archiveTarefa(id) {
             showModal("Arquivar Tarefa", "A tarefa sairá da lista e irá para a aba Arquivadas. Continuar?", "Arquivar", "btn-archive", async () => {
+                showLoader(true);
                 state.tarefas = state.tarefas.filter(t => t.id !== id);
                 saveLocalOrder();
                 renderTarefas();
                 await fetchAPI({ action: 'archiveTarefa', id: id });
+                showLoader(false);
             });
         }
 
         function deleteTarefa(id) {
             showModal("Excluir Tarefa", "Enviar esta tarefa para a Lixeira? Ela será deletada após 30 dias.", "Sim, excluir", "btn-danger", async () => {
+                showLoader(true);
                 state.tarefas = state.tarefas.filter(t => t.id !== id);
                 saveLocalOrder();
                 renderTarefas();
                 await fetchAPI({ action: 'deleteTarefa', id: id });
+                showLoader(false);
             });
         }
 
@@ -1689,12 +2010,14 @@
             const input = document.getElementById('novaCategoriaInput');
             const nome = input.value.trim();
             if (!nome) return;
+            showLoader(true);
             await fetchAPI({ action: 'addCategoria', nome: nome });
             if (!state.categorias.includes(nome)) state.categorias.push(nome);
             renderCategorias();
             document.getElementById('categoria').value = nome;
             input.value = '';
             toggleNewCategory();
+            showLoader(false);
         }
 
         function removeCurrentCategory() {
@@ -1705,9 +2028,11 @@
                 return;
             }
             showModal("Desativar Categoria", `Desativar a categoria "${nome}"? Tarefas antigas não serão afetadas.`, "Sim, desativar", "btn-danger", async () => {
+                showLoader(true);
                 await fetchAPI({ action: 'desativarCategoria', nome: nome });
                 state.categorias = state.categorias.filter(c => c !== nome);
                 renderCategorias();
+                showLoader(false);
             });
         }
 
