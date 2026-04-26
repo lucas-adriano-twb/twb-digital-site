@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHC Construções Metálicas</title>
+    
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Ícones (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS (CDN para execução em arquivo único) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuração da Paleta de Cores e Estilos -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        ghc: {
+                            blue: '#5EBAD4',
+                            dark: '#000000',
+                            darker: '#0a0a0a',
+                            slate: '#355969',
+                            gray: '#B1B2B2',
+                            light: '#E6E7E7',
+                        }
+                    },
+                    backgroundImage: {
+                        'hero-pattern': "url('./assets/Obra Galpão Metálico Cunha (1).jpeg')",
+                        'cta-pattern': "url('./assets/Obra Galpão Metálico Cunha (2).jpeg')",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Estilos complementares que excedem as classes utilitárias base */
+        body {
+            background-color: #000000;
+            color: #E6E7E7;
+        }
+        
+        .glass-header {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(53, 89, 105, 0.3);
+        }
+
+        .card-border {
+            border: 1px solid rgba(53, 89, 105, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .card-border:hover {
+            border-color: #5EBAD4;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px -10px rgba(94, 186, 212, 0.15);
+        }
+        
+        /* Ajuste fino para imagens de fundo */
+        .bg-overlay {
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.9) 100%);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-ghc-blue selection:text-white">
+
+    <!-- 1. Topo fixo / Menu simples -->
+    <header class="fixed w-full top-0 z-50 glass-header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="flex items-center gap-3">
+                        <img class="h-14 md:h-20 w-auto object-cover rounded transition-all duration-300" src="./assets/logo-ghc-sem-fundo.png" alt="Logo GHC Construções Metálicas">
+                    </a>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#inicio" class="text-ghc-light hover:text-ghc-blue text-sm font-medium transition-colors">Início</a>
+                    <a href="#solucoes" class="text-ghc-light hover:text-ghc-blue text-sm font-medium transition-colors">Soluções</a>
+                    <a href="#obras" class="text-ghc-light hover:text-ghc-blue text-sm font-medium transition-colors">Obras</a>
+                    <a href="#etapas" class="text-ghc-light hover:text-ghc-blue text-sm font-medium transition-colors">Etapas do Processo</a>
+                </nav>
+
+                <!-- CTA Desktop -->
+                <div class="hidden md:flex items-center">
+                    <a href="https://wa.me/5512991128841" target="_blank" rel="noopener" class="bg-ghc-blue hover:bg-ghc-slate text-black hover:text-white px-6 py-2.5 rounded text-sm font-bold transition-all duration-300">
+                        Solicitar orçamento
+                    </a>
+                </div>
+
+                <!-- Controles Mobile (CTA Secundário + Botão Sanduíche) -->
+                <div class="md:hidden flex items-center gap-3">
+                    <a href="https://wa.me/5512991128841" target="_blank" rel="noopener" class="bg-ghc-blue text-black hover:bg-white px-3 py-1.5 rounded text-xs font-bold transition-all duration-300 flex items-center gap-1.5">
+                        <i class="ph ph-whatsapp text-base"></i> Contato
+                    </a>
+                    <button id="mobile-menu-btn" class="text-ghc-light hover:text-ghc-blue focus:outline-none flex items-center">
+                        <i class="ph ph-list text-3xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Mobile Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-ghc-dark border-t border-ghc-slate/30">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#inicio" class="block px-3 py-2 text-base font-medium text-ghc-light hover:text-ghc-blue">Início</a>
+                <a href="#solucoes" class="block px-3 py-2 text-base font-medium text-ghc-light hover:text-ghc-blue">Soluções</a>
+                <a href="#obras" class="block px-3 py-2 text-base font-medium text-ghc-light hover:text-ghc-blue">Obras</a>
+                <a href="#etapas" class="block px-3 py-2 text-base font-medium text-ghc-light hover:text-ghc-blue">Etapas do Processo</a>
+                <a href="https://wa.me/5512991128841" target="_blank" class="block w-full text-center mt-4 bg-ghc-blue text-black px-4 py-3 rounded font-bold">
+                    Solicitar orçamento
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. Hero Principal -->
+    <section id="inicio" class="relative h-screen min-h-[600px] flex items-center justify-center bg-ghc-darker">
+        <!-- Background Image com Overlay -->
+        <div class="absolute inset-0 z-0">
+            <img src="./assets/Obra Galpão Metálico Cunha (1).jpeg" alt="Galpão Metálico" class="w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-overlay"></div>
+        </div>
+        
+        <!-- Ajuste de padding-top para não ser escondido pelo header no mobile -->
+        <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-32 pb-16 md:pt-24 md:pb-0">
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-6 leading-tight">
+                Estruturas metálicas de alto padrão para obras<span class="text-ghc-blue"> comerciais, industriais e projetos especiais.</span>
+            </h1>
+            <p class="mt-4 text-base sm:text-lg lg:text-xl text-ghc-gray max-w-3xl mx-auto mb-8 md:mb-10 font-light leading-relaxed">
+                A GHC desenvolve e executa soluções metálicas sob medida para quem precisa de segurança estrutural, agilidade na entrega e acabamento superior em cada detalhe do projeto.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4 w-full sm:w-auto">
+                <a href="https://wa.me/5512991128841" target="_blank" class="w-full sm:w-auto bg-ghc-blue text-black hover:bg-white px-6 py-3.5 sm:px-8 sm:py-4 rounded-lg font-bold text-base sm:text-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_4px_14px_0_rgba(94,186,212,0.39)] hover:shadow-[0_6px_20px_rgba(94,186,212,0.23)]">
+                    <i class="ph ph-whatsapp text-xl"></i> Falar com a GHC
+                </a>
+                <a href="#obras" class="w-full sm:w-auto border border-ghc-slate text-white hover:border-ghc-blue hover:text-ghc-blue px-6 py-3.5 sm:px-8 sm:py-4 rounded-lg font-semibold text-base sm:text-lg transition-all duration-300">
+                    Ver obras realizadas
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Faixa rápida de autoridade -->
+    <div class="bg-ghc-darker border-y border-ghc-slate/30 py-4 md:py-6 relative z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-2 text-center md:divide-x divide-ghc-slate/30">
+                <div class="px-2">
+                    <p class="text-white font-medium text-sm sm:text-base flex flex-col sm:flex-row items-center justify-center"><i class="ph ph-ruler text-ghc-blue text-xl sm:text-base sm:mr-1 mb-1 sm:mb-0"></i> Projetos sob medida</p>
+                </div>
+                <div class="px-2 md:border-l border-ghc-slate/30">
+                    <p class="text-white font-medium text-sm sm:text-base flex flex-col sm:flex-row items-center justify-center"><i class="ph ph-crosshair text-ghc-blue text-xl sm:text-base sm:mr-1 mb-1 sm:mb-0"></i> Execução com precisão</p>
+                </div>
+                <div class="px-2 border-t md:border-t-0 md:border-l border-ghc-slate/30 pt-4 md:pt-0">
+                    <p class="text-white font-medium text-sm sm:text-base flex flex-col sm:flex-row items-center justify-center"><i class="ph ph-shield-check text-ghc-blue text-xl sm:text-base sm:mr-1 mb-1 sm:mb-0"></i> Materiais de qualidade</p>
+                </div>
+                <div class="px-2 border-t md:border-t-0 md:border-l border-ghc-slate/30 pt-4 md:pt-0">
+                    <p class="text-white font-medium text-sm sm:text-base flex flex-col sm:flex-row items-center justify-center"><i class="ph ph-map-pin text-ghc-blue text-xl sm:text-base sm:mr-1 mb-1 sm:mb-0"></i> Atendimento regional</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Seção "A estrutura certa muda o resultado da obra" -->
+    <section class="py-16 md:py-24 bg-ghc-dark relative overflow-hidden">
+        <div class="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 border-[40px] border-ghc-slate/5 rounded-full opacity-50 pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col lg:flex-row gap-12 lg:gap-16 items-center">
+                
+                <div class="w-full lg:w-1/2">
+                    <span class="text-ghc-blue tracking-widest font-bold text-sm uppercase mb-3 block">Excelência Estrutural</span>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+                        A estrutura certa muda o <span class="text-ghc-blue">resultado da obra</span>
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <p class="text-ghc-gray text-base sm:text-lg leading-relaxed font-light">
+                            Cada obra tem um desafio diferente: vencer grandes vãos, otimizar espaço, garantir segurança, manter o acabamento visual e cumprir prazos. A escolha da empresa responsável pela estrutura metálica faz diferença do projeto à entrega final.
+                        </p>
+                        
+                        <div class="bg-ghc-darker p-6 rounded-r-xl border-l-4 border-ghc-blue shadow-lg">
+                            <p class="text-white text-base sm:text-lg font-medium leading-relaxed">
+                                Na GHC, cada solução é pensada conforme a necessidade real da obra, com foco em <span class="text-ghc-blue">resistência, funcionalidade e acabamento</span>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-1/2 relative">
+                    <div class="absolute inset-0 bg-ghc-slate/20 transform translate-x-4 translate-y-4 lg:translate-x-6 lg:translate-y-6 rounded-lg hidden sm:block"></div>
+                    <div class="absolute inset-0 border-2 border-ghc-blue/30 transform -translate-x-3 -translate-y-3 lg:-translate-x-4 lg:-translate-y-4 rounded-lg hidden sm:block"></div>
+                    
+                    <img src="./assets/obra-adium-2.jpeg" alt="Estruturas Metálicas GHC" class="relative z-10 w-full h-[300px] sm:h-[400px] lg:h-[500px] object-cover rounded-lg shadow-2xl">
+                    
+                    <div class="absolute bottom-4 -left-4 lg:bottom-8 lg:-left-8 z-20 bg-ghc-darker border border-ghc-slate/40 p-3 lg:p-4 rounded-lg shadow-xl flex items-center gap-3 lg:gap-4">
+                        <div class="w-10 h-10 lg:w-12 lg:h-12 bg-ghc-blue/10 rounded-full flex items-center justify-center">
+                            <i class="ph ph-medal text-xl lg:text-2xl text-ghc-blue"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold text-xs lg:text-sm">Alto Padrão</p>
+                            <p class="text-ghc-gray text-[10px] lg:text-xs">Acabamento Premium</p>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Soluções da GHC -->
+    <section id="solucoes" class="py-16 md:py-24 bg-ghc-darker">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+                <h2 class="text-3xl font-bold text-white mb-4">Soluções em estruturas metálicas</h2>
+                <div class="w-20 h-1 bg-ghc-blue mx-auto mb-6"></div>
+                <p class="text-ghc-gray text-sm sm:text-base">Projetos customizados para atender especificações técnicas rígidas e garantir a longevidade da construção.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-ghc-dark p-6 sm:p-8 card-border rounded-lg relative overflow-hidden group">
+                    <i class="ph ph-factory text-4xl text-ghc-blue mb-4 block group-hover:scale-110 transition-transform"></i>
+                    <h3 class="text-xl font-bold text-white mb-3">Galpões industriais e comerciais</h3>
+                    <p class="text-ghc-gray text-sm leading-relaxed">Estruturas projetadas para grandes vãos, resistência a cargas de vento e montagem eficiente.</p>
+                </div>
+                
+                <div class="bg-ghc-dark p-6 sm:p-8 card-border rounded-lg relative overflow-hidden group">
+                    <i class="ph ph-house-line text-4xl text-ghc-blue mb-4 block group-hover:scale-110 transition-transform"></i>
+                    <h3 class="text-xl font-bold text-white mb-3">Coberturas metálicas</h3>
+                    <p class="text-ghc-gray text-sm leading-relaxed">Soluções para áreas comerciais, industriais e residenciais, com opção de telhas termoacústicas para melhor isolamento.</p>
+                </div>
+
+                <div class="bg-ghc-dark p-6 sm:p-8 card-border rounded-lg relative overflow-hidden group">
+                    <i class="ph ph-steps text-4xl text-ghc-blue mb-4 block group-hover:scale-110 transition-transform"></i>
+                    <h3 class="text-xl font-bold text-white mb-3">Escadas e mezaninos metálicos</h3>
+                    <p class="text-ghc-gray text-sm leading-relaxed">Projetos funcionais dimensionados para cargas específicas, aliando segurança estrutural e acabamento moderno.</p>
+                </div>
+
+                <div class="bg-ghc-dark p-6 sm:p-8 card-border rounded-lg relative overflow-hidden group">
+                    <i class="ph ph-grid-nine text-4xl text-ghc-blue mb-4 block group-hover:scale-110 transition-transform"></i>
+                    <h3 class="text-xl font-bold text-white mb-3">Guarda-corpos e portões</h3>
+                    <p class="text-ghc-gray text-sm leading-relaxed">Peças sob medida com foco rigoroso em normas de segurança, estética e alta durabilidade a intempéries.</p>
+                </div>
+
+                <div class="bg-ghc-dark p-6 sm:p-8 card-border rounded-lg relative overflow-hidden group">
+                    <i class="ph ph-buildings text-4xl text-ghc-blue mb-4 block group-hover:scale-110 transition-transform"></i>
+                    <h3 class="text-xl font-bold text-white mb-3">Platibandas e fechamentos</h3>
+                    <p class="text-ghc-gray text-sm leading-relaxed">Acabamento moderno para fachadas, oclusão de telhados e fechamentos laterais de alta precisão de montagem.</p>
+                </div>
+
+                <div class="bg-ghc-dark p-6 sm:p-8 card-border rounded-lg relative overflow-hidden group">
+                    <i class="ph ph-compass-tool text-4xl text-ghc-blue mb-4 block group-hover:scale-110 transition-transform"></i>
+                    <h3 class="text-xl font-bold text-white mb-3">Obras especiais sob medida</h3>
+                    <p class="text-ghc-gray text-sm leading-relaxed">Soluções estruturais personalizadas para desafios complexos, exigindo vigas em balanço e arranjos não-convencionais.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Galeria de Obras -->
+    <section id="obras" class="py-16 md:py-24 bg-ghc-darker border-y border-ghc-slate/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+                <h2 class="text-3xl font-bold text-white mb-4">Obras executadas pela GHC</h2>
+                <div class="w-20 h-1 bg-ghc-blue mx-auto mb-6"></div>
+                <p class="text-ghc-gray text-sm sm:text-base">Confira nosso Portfólio que demonstra nossa capacidade de entrega em diferentes graus de complexidade arquitetônica e estrutural.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="group relative overflow-hidden rounded-lg bg-ghc-dark card-border flex flex-col">
+                    <div class="h-56 sm:h-64 w-full overflow-hidden bg-black flex items-center justify-center">
+                        <img src="./assets/viga-em-balanço.webp" alt="Viga em Balanço" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    </div>
+                    <div class="p-6 border-t border-ghc-slate/30 flex-grow">
+                        <h4 class="text-white font-bold text-lg mb-2 uppercase">Viga em Balanço</h4>
+                        <p class="text-ghc-gray text-sm leading-relaxed">
+                            Executada sem pilares de sustentação, garantindo um visual moderno, limpo e arrojado — uma solução que exige precisão e excelência técnica.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="group relative overflow-hidden rounded-lg bg-ghc-dark card-border flex flex-col">
+                    <div class="h-56 sm:h-64 w-full overflow-hidden bg-black flex items-center justify-center">
+                        <img src="./assets/telhado-embutido.webp" alt="Telhado Embutido" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    </div>
+                    <div class="p-6 border-t border-ghc-slate/30 flex-grow">
+                        <h4 class="text-white font-bold text-lg mb-2 uppercase">Telhado Embutido</h4>
+                        <p class="text-ghc-gray text-sm leading-relaxed">
+                            Realizado com telha forro termoacústica, que proporciona conforto térmico e isolamento acústico, contribuindo para um ambiente mais eficiente e agradável.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="group relative overflow-hidden rounded-lg bg-ghc-dark card-border flex flex-col">
+                    <div class="h-56 sm:h-64 w-full overflow-hidden bg-black flex items-center justify-center">
+                        <img src="./assets/Obra Galpão Metálico Cunha (2).jpeg" alt="Platibanda Metálica" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    </div>
+                    <div class="p-6 border-t border-ghc-slate/30 flex-grow">
+                        <h4 class="text-white font-bold text-lg mb-2 uppercase">Platibanda Metálica</h4>
+                        <p class="text-ghc-gray text-sm leading-relaxed">
+                            Acabamento de telhado com platibanda metálica, unindo proteção contra intempéries e estética industrial sofisticada.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="group relative overflow-hidden rounded-lg bg-ghc-dark card-border flex flex-col">
+                    <div class="h-56 sm:h-64 w-full overflow-hidden bg-black flex items-center justify-center">
+                        <img src="./assets/escada-metalica.png" alt="Escada Metálica" class="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    </div>
+                    <div class="p-6 border-t border-ghc-slate/30 flex-grow">
+                        <h4 class="text-white font-bold text-lg mb-2 uppercase">Escada Metálica</h4>
+                        <p class="text-ghc-gray text-sm leading-relaxed">
+                            Construída em viga metálica W para uma sustentação central e degraus em modelo bandeja para preenchimento em concreto e acabamento em cimento queimado.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="group relative overflow-hidden rounded-lg bg-ghc-dark card-border flex flex-col">
+                    <div class="h-56 sm:h-64 w-full overflow-hidden bg-black flex items-center justify-center">
+                        <img src="./assets/corrimão (1).jpeg" alt="Guarda Corpo" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    </div>
+                    <div class="p-6 border-t border-ghc-slate/30 flex-grow">
+                        <h4 class="text-white font-bold text-lg mb-2 uppercase">Guarda Corpo</h4>
+                        <p class="text-ghc-gray text-sm leading-relaxed">
+                            Executado com perfis tubulares e tela metálica vazada, garantindo segurança sem comprometer a leveza visual — uma solução funcional e moderna.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="group relative overflow-hidden rounded-lg bg-ghc-dark card-border flex flex-col">
+                    <div class="h-56 sm:h-64 w-full overflow-hidden bg-black flex items-center justify-center">
+                        <img src="./assets/galpao-metalico.webp" alt="Galpão" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    </div>
+                    <div class="p-6 border-t border-ghc-slate/30 flex-grow">
+                        <h4 class="text-white font-bold text-lg mb-2 uppercase">Galpão</h4>
+                        <p class="text-ghc-gray text-sm leading-relaxed">
+                            Executada com treliças e cobertura metálica, garantindo leveza, resistência e agilidade na montagem — uma solução eficiente para grandes vãos livres.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. Clientes / Prova Social -->
+    <section class="py-16 bg-ghc-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h3 class="text-xl sm:text-2xl font-medium text-white mb-12 md:mb-16">Empresas que já confiaram na competência técnica da GHC</h3>
+            
+            <div class="relative max-w-5xl mx-auto">
+                <!-- Linha central horizontal (Desktop) -->
+                <div class="hidden md:block absolute left-4 right-4 top-1/2 -translate-y-1/2 h-[2px] bg-ghc-blue z-0 opacity-80"></div>
+
+                <!-- Logos Flex Container -->
+                <div class="relative z-10 flex flex-wrap justify-center items-center gap-4 sm:gap-8 md:gap-10 transition-all duration-500">
+                    <!-- Adium -->
+                    <div class="w-20 h-20 sm:w-28 sm:h-28 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-xl border border-ghc-slate/20">
+                        <img src="./assets/logo-adium.jpeg" alt="Logo Adium" class="w-full h-full object-cover">
+                    </div>
+                    
+                    <!-- Aço-Fer -->
+                    <div class="w-20 h-20 sm:w-28 sm:h-28 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-xl border border-ghc-slate/20">
+                        <img src="./assets/Logo Aço-Fer.png" alt="Logo Aço-Fer" class="w-[99%] h-[99%] object-contain bg-white">
+                    </div>
+                    
+                    <!-- 1300 Estate -->
+                    <div class="w-20 h-20 sm:w-28 sm:h-28 bg-[#1a1a1a] rounded-full flex items-center justify-center overflow-hidden shadow-xl border border-ghc-slate/20">
+                        <img src="./assets/logo-1300estate.png" alt="Logo 1300 Estate" class="w-full h-full object-cover bg-[#1a1a1a]">
+                    </div>
+                    
+                    <!-- GAP BR -->
+                    <div class="w-20 h-20 sm:w-28 sm:h-28 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-xl border border-ghc-slate/20">
+                        <img src="./assets/logo-gapbr.png" alt="Logo GAP BR" class="w-full h-full object-cover bg-white">
+                    </div>
+                    
+                    <!-- MRS -->
+                    <div class="w-20 h-20 sm:w-28 sm:h-28 bg-[#1e2a47] rounded-full flex items-center justify-center overflow-hidden shadow-xl border border-ghc-slate/20">
+                        <img src="./assets/logo-mrs.jpeg" alt="Logo MRS" class="w-full h-full object-cover">
+                    </div>
+                    
+                    <!-- Tinoco -->
+                    <div class="w-20 h-20 sm:w-28 sm:h-28 bg-[#2d2d2d] rounded-full flex items-center justify-center overflow-hidden shadow-xl border border-ghc-slate/20">
+                        <img src="./assets/logo-tinoco.jpeg" alt="Logo Tinoco" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mt-12 md:mt-16 text-ghc-light text-sm sm:text-lg max-w-3xl mx-auto font-medium leading-relaxed tracking-wide">
+                De estruturas comerciais a obras industriais, a GHC atua em projetos que exigem tolerância zero para falhas, provendo segurança, precisão e confiabilidade.
+            </p>
+        </div>
+    </section>
+
+    <!-- 9. Processo de atendimento (Timeline) -->
+    <section id="etapas" class="py-16 md:py-24 bg-ghc-darker border-t border-ghc-slate/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 md:mb-20">
+                <h2 class="text-3xl font-bold text-white mb-4">Etapas do Projeto</h2>
+                <div class="w-20 h-1 bg-ghc-blue mx-auto"></div>
+            </div>
+
+            <div class="relative max-w-4xl mx-auto">
+                <!-- Linha central da Timeline -->
+                <div class="absolute left-[28px] md:left-1/2 top-0 bottom-0 w-px bg-ghc-slate/30 md:-translate-x-1/2"></div>
+
+                <!-- Passo 1 (Esquerda no Desktop) -->
+                <!-- Adicionado top-1/2 e -translate-y-1/2 no ícone para alinhamento perfeitamente ao centro vertical -->
+                <div class="relative flex flex-col md:flex-row items-center justify-between w-full mb-10 md:mb-12">
+                    <div class="absolute top-1/2 left-[28px] md:left-1/2 w-12 h-12 transform -translate-y-1/2 -translate-x-1/2 rounded-full bg-ghc-dark border-2 border-ghc-blue flex items-center justify-center z-10 shadow-[0_0_15px_rgba(94,186,212,0.2)]">
+                        <i class="ph ph-handshake text-xl text-ghc-blue"></i>
+                    </div>
+                    <div class="w-full md:w-1/2 pl-20 md:pl-0 md:pr-16 py-2">
+                        <div class="bg-ghc-dark p-6 rounded-lg border border-ghc-slate/20 hover:border-ghc-blue/50 transition-colors shadow-lg">
+                            <h4 class="text-lg font-bold text-white mb-2">Contato Inicial</h4>
+                            <p class="text-ghc-gray text-sm leading-relaxed">Você entra em contato conosco e apresenta sua ideia ou desejo. Vamos ouvir e entender o que você busca realizar.</p>
+                        </div>
+                    </div>
+                    <div class="hidden md:block md:w-1/2"></div>
+                </div>
+
+                <!-- Passo 2 (Direita no Desktop) -->
+                <div class="relative flex flex-col md:flex-row items-center justify-between w-full mb-10 md:mb-12">
+                    <div class="absolute top-1/2 left-[28px] md:left-1/2 w-12 h-12 transform -translate-y-1/2 -translate-x-1/2 rounded-full bg-ghc-dark border-2 border-ghc-blue flex items-center justify-center z-10 shadow-[0_0_15px_rgba(94,186,212,0.2)]">
+                        <i class="ph ph-magnifying-glass text-xl text-ghc-blue"></i>
+                    </div>
+                    <div class="hidden md:block md:w-1/2"></div>
+                    <div class="w-full md:w-1/2 pl-20 md:pl-16 md:pr-0 py-2">
+                        <div class="bg-ghc-dark p-6 rounded-lg border border-ghc-slate/20 hover:border-ghc-blue/50 transition-colors shadow-lg">
+                            <h4 class="text-lg font-bold text-white mb-2">Análise Técnica</h4>
+                            <p class="text-ghc-gray text-sm leading-relaxed">Nossa equipe avalia as necessidades e os requisitos técnicos do local para definir a melhor solução estrutural.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Passo 3 (Esquerda no Desktop) -->
+                <div class="relative flex flex-col md:flex-row items-center justify-between w-full mb-10 md:mb-12">
+                    <div class="absolute top-1/2 left-[28px] md:left-1/2 w-12 h-12 transform -translate-y-1/2 -translate-x-1/2 rounded-full bg-ghc-dark border-2 border-ghc-blue flex items-center justify-center z-10 shadow-[0_0_15px_rgba(94,186,212,0.2)]">
+                        <i class="ph ph-blueprint text-xl text-ghc-blue"></i>
+                    </div>
+                    <div class="w-full md:w-1/2 pl-20 md:pl-0 md:pr-16 py-2">
+                        <div class="bg-ghc-dark p-6 rounded-lg border border-ghc-slate/20 hover:border-ghc-blue/50 transition-colors shadow-lg">
+                            <h4 class="text-lg font-bold text-white mb-2">Desenvolvimento do Projeto</h4>
+                            <p class="text-ghc-gray text-sm leading-relaxed">Você vê exatamente o que vai receber. Desenvolvemos o detalhamento visual e técnico da sua estrutura metálica.</p>
+                        </div>
+                    </div>
+                    <div class="hidden md:block md:w-1/2"></div>
+                </div>
+
+                <!-- Passo 4 (Direita no Desktop) -->
+                <div class="relative flex flex-col md:flex-row items-center justify-between w-full mb-10 md:mb-12">
+                    <div class="absolute top-1/2 left-[28px] md:left-1/2 w-12 h-12 transform -translate-y-1/2 -translate-x-1/2 rounded-full bg-ghc-dark border-2 border-ghc-blue flex items-center justify-center z-10 shadow-[0_0_15px_rgba(94,186,212,0.2)]">
+                        <i class="ph ph-presentation-chart text-xl text-ghc-blue"></i>
+                    </div>
+                    <div class="hidden md:block md:w-1/2"></div>
+                    <div class="w-full md:w-1/2 pl-20 md:pl-16 md:pr-0 py-2">
+                        <div class="bg-ghc-dark p-6 rounded-lg border border-ghc-slate/20 hover:border-ghc-blue/50 transition-colors shadow-lg">
+                            <h4 class="text-lg font-bold text-white mb-2">Apresentação da Proposta</h4>
+                            <p class="text-ghc-gray text-sm leading-relaxed">Apresentamos o escopo final, materiais que serão utilizados, prazos e os valores de forma totalmente transparente.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Passo 5 (Esquerda no Desktop) -->
+                <div class="relative flex flex-col md:flex-row items-center justify-between w-full">
+                    <div class="absolute top-1/2 left-[28px] md:left-1/2 w-12 h-12 transform -translate-y-1/2 -translate-x-1/2 rounded-full bg-ghc-dark border-2 border-ghc-blue flex items-center justify-center z-10 shadow-[0_0_15px_rgba(94,186,212,0.2)]">
+                        <i class="ph ph-crane text-xl text-ghc-blue"></i>
+                    </div>
+                    <div class="w-full md:w-1/2 pl-20 md:pl-0 md:pr-16 py-2">
+                        <div class="bg-ghc-dark p-6 rounded-lg border border-ghc-slate/20 hover:border-ghc-blue/50 transition-colors shadow-lg">
+                            <h4 class="text-lg font-bold text-white mb-2">Execução da Obra</h4>
+                            <p class="text-ghc-gray text-sm leading-relaxed">Com tudo aprovado, nossa equipe realiza a fabricação e montagem in loco com rigoroso controle de segurança.</p>
+                        </div>
+                    </div>
+                    <div class="hidden md:block md:w-1/2"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. CTA Forte -->
+    <section class="relative py-20 md:py-32 bg-ghc-dark overflow-hidden flex items-center justify-center text-center">
+        <div class="absolute inset-0 z-0">
+             <img src="./assets/Obra Cobertura Metálica Adium 1.jpg.jpg" alt="Fundo CTA" class="w-full h-full object-cover">
+             <div class="absolute inset-0 bg-black/85 backdrop-blur-sm"></div>
+        </div>
+
+        <div class="relative z-10 max-w-4xl mx-auto px-4 w-full">
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 tracking-tight">Tem um projeto metálico para tirar do papel?</h2>
+            <p class="text-base sm:text-xl text-ghc-gray mb-8 sm:mb-10 font-light max-w-2xl mx-auto">
+                Fale com a GHC e receba uma análise detalhada para sua cobertura, galpão, escada, mezanino, fechamento ou estrutura sob medida.
+            </p>
+            <a href="https://wa.me/5512991128841" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-ghc-blue text-black hover:bg-white px-6 py-4 sm:px-10 sm:py-5 rounded-lg font-bold text-lg sm:text-xl transition-all duration-300 shadow-[0_0_40px_-10px_rgba(94,186,212,0.5)]">
+                <i class="ph ph-whatsapp text-2xl sm:text-3xl"></i> Solicitar orçamento
+            </a>
+        </div>
+    </section>
+
+    <!-- 11. Rodapé -->
+    <footer class="bg-ghc-darker border-t border-ghc-slate/20 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                <!-- Marca -->
+                <div>
+                    <img class="h-14 w-auto object-cover rounded mb-6" src="./assets/logo-ghc-sem-fundo.png" alt="Logo GHC">
+                    <p class="text-ghc-gray text-sm leading-relaxed mb-6">
+                        Soluções estruturais metálicas projetadas para garantir performance, segurança e um acabamento estético impecável à sua obra.
+                    </p>
+                </div>
+
+                <!-- Links Rápidos -->
+                <div>
+                    <h4 class="text-white font-bold mb-6 tracking-wider text-sm uppercase border-l-2 border-ghc-blue pl-3">Links Rápidos</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#solucoes" class="text-ghc-gray hover:text-ghc-blue text-sm transition-colors">Soluções em Estruturas</a></li>
+                        <li><a href="#obras" class="text-ghc-gray hover:text-ghc-blue text-sm transition-colors">Obras e Portfólio</a></li>
+                        <li><a href="#inicio" class="text-ghc-gray hover:text-ghc-blue text-sm transition-colors">Voltar ao Topo</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contato -->
+                <div>
+                    <h4 class="text-white font-bold mb-6 tracking-wider text-sm uppercase border-l-2 border-ghc-blue pl-3">Contato Integrado</h4>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <i class="ph ph-map-pin text-ghc-blue mt-1 mr-3 text-lg"></i>
+                            <span class="text-ghc-gray text-sm">Pindamonhangaba / SP<br>Atendimento em toda a região</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="ph ph-whatsapp-logo text-ghc-blue mr-3 text-lg"></i>
+                            <a href="https://wa.me/5512991128841" target="_blank" class="text-ghc-gray hover:text-white text-sm transition-colors font-medium">
+                                (12) 99112-8841
+                            </a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="ph ph-envelope-simple text-ghc-blue mr-3 text-lg"></i>
+                            <a href="mailto:ghc.construcoesmetalicas@gmail.com" class="text-ghc-gray hover:text-white text-sm transition-colors">
+                                ghc.construcoesmetalicas@gmail.com
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Rodapé final centralizado com rigor -->
+            <div class="border-t border-ghc-slate/20 pt-8 flex justify-center items-center w-full">
+                <p class="text-ghc-slate text-sm text-center w-full">
+                    &copy; 2026 GHC Construções Metálicas. Todos os direitos reservados.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Lógica de Toggle do Menu Mobile
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+
+            // Fecha o menu ao clicar em um link
+            const mobileLinks = menu.querySelectorAll('a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    menu.classList.add('hidden');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
